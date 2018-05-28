@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+	<head>
+
+		<title>Sisboi - Animal Profile</title>
+
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<!--Import Google Icon Font-->
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+	rel="stylesheet" />
+
+		<!--Import materialize.css-->
+		<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css" />
+
+	</head>
+
+	<body>
+
+		<header>
+
+			<nav class="teal darken-4">
+				<div class="nav-wrapper">
+					<a href="index.html" class="brand-logo">Sisboi</a> <a href="index.html"
+							   data-activates="mobile-demo" class="button-collapse"><i
+				       class="material-icons">menu</i></a>
+					<ul class="right hide-on-med-and-down">
+						<li><a href="/animal">Animal</a></li>
+						<li><a href="/medicine">Medicine</a></li>
+						<li><a href="medication.html">Medication</a></li>
+						<li><a href="login.html">Sair</a></li>
+					</ul>
+					<ul class="side-nav" id="mobile-demo">
+						<li><a href="/animal">Animal</a></li>
+						<li><a href="/medicine">Medicine</a></li>
+						<li><a href="medication.html">Medication</a></li>
+						<li><a href="login.html">Logout</a></li>
+					</ul>
+				</div>
+			</nav>
+
+		</header>
+
+		<!-- Page Layout here -->
+		<div class="row">
+
+			<div class="col s12 m4 l3"> <!-- Note that "m4 l3" was added -->
+				<div class="fixed-action-btn">
+					<a class="btn-floating btn-large teal darken-4">
+						<i class="large material-icons">mode_edit</i>
+
+					</a>
+					<ul>
+						<li><a class="btn-floating red"><i class="material-icons">insert_chart</i></a>editar animal</li>
+						<li><a class="btn-floating yellow darken-1"><i class="material-icons">format_quote</i></a>atulizar peso</li>
+						<li><a class="btn-floating green"><i class="material-icons">publish</i></a>scoorr</li>
+						<li><a class="btn-floating blue"><i class="material-icons">attach_file</i></a>sla?</li>
+					</ul>
+				</div>
+
+
+				<div class="row">
+					<div class="card-panel">
+						<div class="center-align">
+							<img src="/pic/{{animal.ID}}" alt="Avatar" style="width:200px">
+						</div>
+						<div class="center-align">
+							<span>{{animal.Name}}</span>  
+
+						</div>
+					</div>
+
+					<div class="card-panel">
+						<div>
+							<span>Nascimento: {{animal.BirthFmt}}</span><br>
+							<span>Peso: {{animal.WeightFmt}}kg</span><br>
+							<span>Tipo: {{animal.Type.Type}}</span><br>
+							<span>Raça: {{animal.Breed.Breed}}</span><br>
+							<span>Propósito: {{animal.PurposesFmt}}</span><br>
+						</div>
+					</div>
+
+					<div class="card-panel">
+						<div class="center-align">
+							<h5>Genealogy:</h5>
+						</div>
+						<div class="row">
+
+							<div class="col s6">
+								<p>Father:</p>
+								<img src="https://i.pinimg.com/originals/47/77/b3/4777b31f72a32030d87951766aadd636.jpg" style="width:100px">
+							</div>
+							<div class="col s6">
+								<p>Mother:</p>
+								<img src="http://www.cattle-exchange.com/sites/default/files/styles/galleryformatter_slide/public/700x437xbreed,P20angus.jpg,qitok=FlUy9hKa.pagespeed.ic.WhGjjGjtZc.jpg" style="width:100px">
+							</div>
+						</div>
+					</div>
+
+					<div class="card-panel">
+						<div class="center-align">
+							<h5>Photos:</h5>
+						</div>
+						<div class="row">
+							<img src="http://ruralpecuaria.com.br/painel/img/noticias/533/noticias_1406497986.jpg" style="width:250px">
+
+							<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyyPjqnupGuyf7VL-zLglLWDkKmwroK_Ex45mpONEc6yveDJoX" style="width:250px">
+
+							<img src="https://imagens.mfrural.com.br/mfrural-produtos-us/90411-220320-1143624-touro-black-angus-vpj-halley-199_p.jpg" style="width:250px">
+
+							<img src="http://www.guaranoticias.com.br/conteudo/7a067ac148cc86a3401f93ef6742bfe5.jpg" style="width:250px">
+						</div>
+					</div>
+
+				</div>
+
+
+			</div>
+
+			<div class="col s12 m8 l9"> <!-- Note that "m8 l9" was added -->
+
+				<div class="card horizontal">
+					<div class="card-image">
+						<div class="row">
+
+							<div class="col s6">
+								<img src="http://ruralpecuaria.com.br/painel/img/noticias/533/noticias_1406497986.jpg" style="width:200px">
+							</div>
+							<div class="col s6">
+								<img src="http://ourofinosaudeanimal.com/media/uploads/produtos/2018/Ourovac_Aftosa_50ml_OF45.png" style="width:200px">
+							</div>
+
+						</div>
+					</div>
+					<div class="card-stacked">
+						<div class="card-content">
+							<p>New medication of José with Ourovac® Aftosa!</p>
+						</div>
+						<div class="card-action">
+							<a href="animal - José.html">Show José</a>
+						</div>
+					</div>
+				</div>
+
+				<div class="card horizontal">
+					<div class="card-image">
+						<img src="http://ruralpecuaria.com.br/painel/img/noticias/533/noticias_1406497986.jpg" style="width:200px">
+					</div>
+					<div class="card-stacked">
+						<div class="card-content">
+							<p>José added successfully!</p>
+						</div>
+						<div class="card-action">
+							<a href="animal - José.html">Show José</a>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+
+			<script type="text/javascript"
+	   src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+			<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+
+			<script type="text/javascript">
+				$(document).ready(function() {
+					$(".button-collapse").sideNav();
+				})
+			</script>
+	</body>
+
+
+</html>

@@ -23,6 +23,8 @@ func main() {
 	db.AutoMigrate(&TypeAnimal{})
 	db.AutoMigrate(&Breed{})
 	db.AutoMigrate(&Purpose{})
+	db.AutoMigrate(&Medicine{})
+	db.AutoMigrate(&TypeMedicine{})
 	db.AutoMigrate(&Picture{})
 
 	r := mux.NewRouter()
@@ -31,6 +33,9 @@ func main() {
 
 	r.HandleFunc("/animal", getAnimal)
 	r.HandleFunc("/newAnimal", postAnimal)
+	r.HandleFunc("/medicine", getMedicine)
+	r.HandleFunc("/newMedicine", postMedicine)
+	r.HandleFunc("/profile/{idAnimal}", getProfile)
 	http.ListenAndServe(":8000", r)
 }
 
@@ -114,4 +119,57 @@ func postAnimal(w http.ResponseWriter, r *http.Request) {
 	db.Save(&animal)
 
 	http.Redirect(w, r, "/animal", http.StatusMovedPermanently)
+}
+
+func getMedicine(w http.ResponseWriter, r *http.Request) {
+
+	medicines := []Medicine{}
+	db.Preload("Type").Find(&medicines, Medicine{})
+
+	types := []TypeMedicine{}
+	db.Find(&types, &TypeMedicine{})
+
+	context := map[string]interface{}{
+		"types":     types,
+		"medicines": medicines,
+	}
+
+	str, _ := mustache.RenderFile("templates/medicine.html", context)
+	bit := []byte(str)
+	w.Write(bit)
+}
+
+func postMedicine(w http.ResponseWriter, r *http.Request) {
+	medicine := NewMedicine()
+	medicine.Name = r.PostFormValue("Name")
+
+	expiration, _ := time.Parse("2006-01-02", r.PostFormValue("Expiration"))
+	medicine.Expiration = mysql.NullTime{Time: expiration, Valid: true}
+
+	medicine.Description = r.PostFormValue("Description")
+
+	typeM := TypeMedicine{}
+	idType, _ := strconv.Atoi(r.PostFormValue("Type"))
+	db.Find(&typeM, idType)
+	medicine.Type = &typeM
+	db.First(&medicine.Type, idType)
+
+	db.Save(&medicine)
+
+	http.Redirect(w, r, "/medicine", http.StatusMovedPermanently)
+}
+
+func getProfile(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	idAnimal, _ := strconv.Atoi(vars["idAnimal"])
+	animal := Animal{}
+	db.Preload("Weights").Preload("Type").Preload("Breed").Preload("Purposes").First(&animal, idAnimal)
+
+	context := map[string]interface{}{
+		"animal": animal,
+	}
+
+	str, _ := mustache.RenderFile("templates/profile.html", context)
+	bit := []byte(str)
+	w.Write(bit)
 }
