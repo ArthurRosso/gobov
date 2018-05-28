@@ -109,11 +109,12 @@ func postAnimal(w http.ResponseWriter, r *http.Request) {
 	}
 	m := r.MultipartForm
 
-	files := m.File("Picture")
-	defer file.Close()
+	files := m.File("Pictures")
+
+	defer files.Close()
 
 	picture := Picture{}
-	picture.Picture, _ = ioutil.ReadAll(file)
+	picture.Picture, _ = ioutil.ReadAll(files)
 	animal.Pictures = append(animal.Pictures, picture)
 
 	db.Save(&animal)
