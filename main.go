@@ -27,6 +27,9 @@ func main() {
 	db.AutoMigrate(&TypeMedicine{})
 	db.AutoMigrate(&Picture{})
 
+	Data()
+	DataM()
+
 	r := mux.NewRouter()
 
 	r.HandleFunc("/pic/{idAnimal}", getPic)
@@ -42,9 +45,8 @@ func main() {
 func getPic(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idAnimal, _ := strconv.Atoi(vars["idAnimal"])
-	animal := Animal{}
 	picture := Picture{}
-	db.Find(&picture, idAnimal)
+	db.First(&picture, idAnimal)
 	if len(picture.Picture) > 0 {
 		w.Write(picture.Picture)
 	}
@@ -107,17 +109,28 @@ func postAnimal(w http.ResponseWriter, r *http.Request) {
 		db.Find(&purpose, id)
 		animal.Purposes = append(animal.Purposes, purpose)
 	}
+
+	r.ParseMultipartForm(0)
 	m := r.MultipartForm
 
-	files := m.File("Pictures")
-
-	defer files.Close()
-
-	picture := Picture{}
-	picture.Picture, _ = ioutil.ReadAll(files)
-	animal.Pictures = append(animal.Pictures, picture)
+	files := m.File["Pictures"]
 
 	db.Save(&animal)
+
+	if len(files) > 0 {
+		pic := Picture{Main: true, AnimalID: animal.ID}
+		arquivo, _ := files[0].Open()
+		pic.Picture, _ = ioutil.ReadAll(arquivo)
+		defer arquivo.Close()
+		db.Save(&pic)
+		for _, file := range files[1:] {
+			picture := Picture{AnimalID: animal.ID}
+			arquivo, _ := file.Open()
+			picture.Picture, _ = ioutil.ReadAll(arquivo)
+			defer arquivo.Close()
+			db.Save(&picture)
+		}
+	}
 
 	http.Redirect(w, r, "/animal", http.StatusMovedPermanently)
 }

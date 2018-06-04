@@ -88,7 +88,7 @@
 										<input name="Pictures" type="file" multiple>
 									</div>
 									<div class="file-path-wrapper">
-										<input class="file-path validate" type="text" placeholder="Uma ou mais fotos.">
+										<input class="file-path validate" name="Pictures" type="text" placeholder="Uma ou mais fotos.">
 									</div>
 								</div>
 							</div>
@@ -118,7 +118,7 @@
 				<tbody>
 					{{#animals}}
 					<tr>
-						<td><img src="/pic/{{ID}}" style="width:100px"/> </td>
+						<td><img src="/pic/{{MainPic.ID}}" style="width:100px"/> </td>
 						<td><a>{{Name}}</a></td>
 						<td>{{BirthFmt}}</td>
 						<td>{{WeightFmt}}</td>

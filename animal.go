@@ -48,3 +48,9 @@ func (a Animal) PurposesFmt() string {
 		return ":("
 	}
 }
+
+func (a Animal) MainPic() Picture {
+	pic := Picture{}
+	db.Where("main=?", 1).First(&pic)
+	return pic
+}
