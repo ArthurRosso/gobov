@@ -15,6 +15,7 @@ type Animal struct {
 	Breed    *Breed
 	Purposes []Purpose `gorm:"many2many:animal_purpose"`
 	Pictures []Picture
+	Medications    []Medication `gorm:"many2many:medication_animal"`
 
 	TypeID  int
 	BreedID int

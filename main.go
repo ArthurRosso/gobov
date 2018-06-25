@@ -27,9 +27,6 @@ func main() {
 	db.AutoMigrate(&TypeMedicine{})
 	db.AutoMigrate(&Picture{})
 
-	Data()
-	DataM()
-
 	r := mux.NewRouter()
 
 	r.HandleFunc("/pic/{idAnimal}", getPic)
@@ -167,6 +164,8 @@ func postMedicine(w http.ResponseWriter, r *http.Request) {
 	db.Find(&typeM, idType)
 	medicine.Type = &typeM
 	db.First(&medicine.Type, idType)
+
+	medicine.Picture = []byte(r.PostFormValue("Picture"))
 
 	db.Save(&medicine)
 

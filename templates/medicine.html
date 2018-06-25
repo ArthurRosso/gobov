@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://thymeleaf.org"
-xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html>
 <head>
 
-	<title>Sisboi - Medicine</title>
+	<title>GoBov - Medicine</title>
 
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -24,20 +23,20 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
 		<nav class="teal darken-4">
 			<div class="nav-wrapper">
-				<a href="index.html" class="brand-logo">Sisboi</a> <a href="index.html"
+				<a href="/" class="brand-logo">GoBov</a> <a href="/"
 				data-activates="mobile-demo" class="button-collapse"><i
 				class="material-icons">menu</i></a>
 				<ul class="right hide-on-med-and-down">
-					<li><a href="animal.html">Animal</a></li>
-					<li><a href="medicine.html">Medicine</a></li>
-					<li><a href="medication.html">Medication</a></li>
-					<li><a href="login.html">Sair</a></li>
+					<li><a href="animal">Animal</a></li>
+					<li><a href="medicine">Medicine</a></li>
+					<li><a href="medication">Medication</a></li>
+					<li><a href="login">Sair</a></li>
 				</ul>
 				<ul class="side-nav" id="mobile-demo">
-					<li><a href="animal.html">Animal</a></li>
-					<li><a href="medicine.html">Medicine</a></li>
-					<li><a href="medication.html">Medication</a></li>
-					<li><a href="login.html">Logout</a></li>
+					<li><a href="animal">Animal</a></li>
+					<li><a href="medicine">Medicine</a></li>
+					<li><a href="medication">Medication</a></li>
+					<li><a href="login">Logout</a></li>
 				</ul>
 			</div>
 		</nav>
@@ -70,10 +69,10 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 							<div class="file-field input-field">
 								<div class="btn teal darken-3">
 									<span>Fotos</span>
-									<input type="file" multiple>
+									<input name="Picture" type="file" multiple>
 								</div>
 								<div class="file-path-wrapper">
-									<input class="file-path validate" type="text" placeholder="Uma ou mais fotos.">
+									<input class="file-path validate" name="Picture" type="text" placeholder="Uma ou mais fotos.">
 								</div>
 							</div>
 						</div>
@@ -87,29 +86,35 @@ xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 			</form>
 		</div>
 	</div>
-	<table class="container">
-		<thead>
-			<tr>
-				
-				<th>Nome</th>
-				<th>Validade</th>
-				<th>Descrição</th>
-				<th>Tipo</th>
-			</tr>
-		</thead>
-		<tbody>
-			{{ #medicines }}
-			<tr>
-				<td><a>{{Name}}</a></td>
-				<td>{{ExpirationFmt}}</td>
-				<td>{{Description}}</td>
-				<td>{{Type.Type}}</td>
-				<td><a class="waves-effect waves-light btn-small"><i class="material-icons left">delete</i></a></td>
-			</tr>
-			{{ /medicines }}
-		</tbody>
+	<div class="row container">
+		{{ #medicines }}
+				<div class="col s12 m6 l3">
+					<div class="card sticky-action" style="overflow: visible;">
+						<div class="card-image waves-effect waves-block waves-light">
+							<img class="activator" src="" style="width:100px">
+						</div>
+						<div class="card-content">
+							<span class="card-title activator grey-text text-darken-4">{{Name}}<i class="material-icons right">more_vert</i></span>
 
-	</table>
+							<p><a href="remedio - Ourovac® Aftosa.html">Show {{Name}}</a></p>
+						</div>
+
+						<div class="card-action">
+							<a href=""><i class="material-icons left">delete</i></a></a>
+							<a href="medicineEditar - Ourovac® Aftosa.html"><i class="material-icons left">edit</i></a></a>
+						</div>
+
+						<div class="card-reveal" style="display: none; transform: translateY(0px);">
+							<span class="card-title grey-text text-darken-4">{{Name}}<i class="material-icons right">close</i></span>
+							<span>Descrição: {{Description}}</span><br>
+							<span>Validade: {{ExpirationFmt}}</span><br>
+							<span>Tipo: {{Type.Type}}</span><br>
+						</div>
+					</div>
+				</div>
+			{{ /medicines }}
+		</div>
+	</div>
 
 	<script type="text/javascript"
 	src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
