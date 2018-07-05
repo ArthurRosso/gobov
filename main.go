@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/cbroglie/mustache"
 	"github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -26,17 +27,24 @@ func main() {
 	db.AutoMigrate(&Medicine{})
 	db.AutoMigrate(&TypeMedicine{})
 	db.AutoMigrate(&Picture{})
+	db.AutoMigrate(&Medication{})
 
 	r := mux.NewRouter()
 
 	r.HandleFunc("/pic/{idAnimal}", getPic)
+	r.HandleFunc("/picMedicine/{idMedicine}", getMedicinePic)
 
 	r.HandleFunc("/animal", getAnimal)
 	r.HandleFunc("/newAnimal", postAnimal)
 	r.HandleFunc("/medicine", getMedicine)
 	r.HandleFunc("/newMedicine", postMedicine)
 	r.HandleFunc("/profile/{idAnimal}", getProfile)
+	r.HandleFunc("/medication", getMedication)
+	r.HandleFunc("/newMedication", postMedication)
+
 	http.ListenAndServe(":8000", r)
+
+	fmt.Println("Server listen and serve on port 8000")
 }
 
 func getPic(w http.ResponseWriter, r *http.Request) {
@@ -49,9 +57,33 @@ func getPic(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// TODO: getFatherPic
+// TODO: getMotherPic
+
+func getMedicinePic(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	medicine := Medicine{}
+	idMedicine, _ := strconv.Atoi(vars["idMedicine"])
+	db.First(&medicine, idMedicine)
+	if len(medicine.Picture) > 0 {
+		w.Write(medicine.Picture)
+	}
+}
+
 func getAnimal(w http.ResponseWriter, r *http.Request) {
 	animals := []Animal{}
 	db.Preload("Weights").Preload("Type").Preload("Breed").Preload("Purposes").Find(&animals, Animal{})
+
+	fathers := []Animal{}
+	mothers := []Animal{}
+	for _, i := range animals {
+		// element is the element from someSlice for where we are
+		if i.Type.Type == "Touro" {
+			fathers = append(fathers, i)
+		} else if i.Type.Type == "Vaca" {
+			mothers = append(mothers, i)
+		}
+	}
 
 	types := []TypeAnimal{}
 	db.Find(&types, &TypeAnimal{})
@@ -67,6 +99,8 @@ func getAnimal(w http.ResponseWriter, r *http.Request) {
 		"breeds":   breeds,
 		"purposes": purposes,
 		"animals":  animals,
+		"mothers":  mothers,
+		"fathers":  fathers,
 	}
 
 	str, _ := mustache.RenderFile("templates/animal.html", context)
@@ -76,8 +110,23 @@ func getAnimal(w http.ResponseWriter, r *http.Request) {
 
 func postAnimal(w http.ResponseWriter, r *http.Request) {
 	animal := NewAnimal()
-	weight := Weight{Description: "Primeira pesagem"}
 	animal.Name = r.PostFormValue("Name")
+
+	motherID, _ := strconv.Atoi(r.PostFormValue("Mother"))
+	if motherID != 0 {
+		mother := Animal{}
+		db.Find(&mother, Animal{ID: motherID})
+		animal.Mother = &mother
+	}
+
+	fatherID, _ := strconv.Atoi(r.PostFormValue("Father"))
+	if fatherID != 0 {
+		father := Animal{}
+		db.First(&father, Animal{ID: fatherID})
+		animal.Father = &father
+	}
+
+	weight := Weight{Description: "Primeira pesagem"}
 
 	birth, _ := time.Parse("2006-01-02", r.PostFormValue("Birthday"))
 	animal.Birthday = mysql.NullTime{Time: birth, Valid: true}
@@ -133,7 +182,6 @@ func postAnimal(w http.ResponseWriter, r *http.Request) {
 }
 
 func getMedicine(w http.ResponseWriter, r *http.Request) {
-
 	medicines := []Medicine{}
 	db.Preload("Type").Find(&medicines, Medicine{})
 
@@ -165,7 +213,15 @@ func postMedicine(w http.ResponseWriter, r *http.Request) {
 	medicine.Type = &typeM
 	db.First(&medicine.Type, idType)
 
-	medicine.Picture = []byte(r.PostFormValue("Picture"))
+	r.ParseMultipartForm(0)
+	f := r.MultipartForm
+	if f == nil {
+		fmt.Println("fuck")
+	}
+	file := f.File["Picture"]
+	arquivo, _ := file[0].Open()
+	medicine.Picture, _ = ioutil.ReadAll(arquivo)
+	defer arquivo.Close()
 
 	db.Save(&medicine)
 
@@ -185,4 +241,55 @@ func getProfile(w http.ResponseWriter, r *http.Request) {
 	str, _ := mustache.RenderFile("templates/profile.html", context)
 	bit := []byte(str)
 	w.Write(bit)
+}
+
+func getMedication(w http.ResponseWriter, r *http.Request) {
+	medications := []Medication{}
+	db.Preload("Animals").Preload("Medicines").Find(&medications, Medication{})
+
+	animals := []Animal{}
+	db.Find(&animals, &Animal{})
+
+	medicines := []Medicine{}
+	db.Find(&medicines, &Medicine{})
+
+	context := map[string]interface{}{
+		"animals": animals,
+		"medicines": medicines,
+		"medications": medications,
+	}
+
+	str, _ := mustache.RenderFile("templates/medication.html", context)
+	bit := []byte(str)
+	w.Write(bit)
+}
+
+func postMedication(w http.ResponseWriter, r *http.Request) {	
+	medication := Medication{}
+	medication.Description = r.PostFormValue("Description")
+
+	date, _ := time.Parse("2006-01-02", r.PostFormValue("Date"))
+	medication.Date = mysql.NullTime{Time: date, Valid: true}
+
+	r.ParseForm()
+	for _, idAnimals := range r.Form["Animal"] {
+		// element is the element from someSlice for where we are
+		animal := Animal{}
+		id, _ := strconv.Atoi(idAnimals)
+		db.Find(&animal, id)
+		medication.Animals = append(medication.Animals, animal)
+	}
+
+	r.ParseForm()
+	for _, idMedicines := range r.Form["Medicine"] {
+		// element is the element from someSlice for where we are
+		medicine := Medicine{}
+		id, _ := strconv.Atoi(idMedicines)
+		db.Find(&medicine, id)
+		medication.Medicines = append(medication.Medicines, medicine)
+	}
+
+	db.Save(&medication)
+
+	http.Redirect(w, r, "/medication", http.StatusMovedPermanently)
 }

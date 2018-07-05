@@ -27,16 +27,16 @@
 							   data-activates="mobile-demo" class="button-collapse"><i
 				       class="material-icons">menu</i></a>
 					<ul class="right hide-on-med-and-down">
-						<li><a href="animal">Animal</a></li>
-						<li><a href="medicine">Medicine</a></li>
-						<li><a href="medication">Medication</a></li>
-						<li><a href="login">Sair</a></li>
+						<li><a href="/animal">Animal</a></li>
+						<li><a href="/medicine">Medicine</a></li>
+						<li><a href="/medication">Medication</a></li>
+						<li><a href="/login">Sair</a></li>
 					</ul>
 					<ul class="side-nav" id="mobile-demo">
-						<li><a href="animal">Animal</a></li>
-						<li><a href="medicine">Medicine</a></li>
-						<li><a href="medication">Medication</a></li>
-						<li><a href="login">Logout</a></li>
+						<li><a href="/animal">Animal</a></li>
+						<li><a href="/medicine">Medicine</a></li>
+						<li><a href="/medication">Medication</a></li>
+						<li><a href="/login">Logout</a></li>
 					</ul>
 				</div>
 			</nav>
@@ -45,30 +45,27 @@
 
 		<div class="container">
 			<div class="card-panel">
-				<form method="post">
-					Descrição: <input type="text" name="descricao" /> 
-					Data: <input type="date" name="validade" />
+				<form method="post" action="/newMedication" enctype="multipart/form-data" >
+					Descrição: <input type="text" name="Description" /> 
+					Data: <input type="date" name="Date" />
 					<div>
 						Animais:
+						{{ #animals }}
 						<p>
-						<input type="checkbox" id="a1" name="a1" />
-						<label for="1">José</label>
+						<input type="checkbox" id="{{ID}}" name="Animal" value="{{ID}}" />
+						<label for="{{ID}}">{{Name}}</label>
 						</p>
-						<p>
-						<input type="checkbox" id="a2" name="a2" />
-						<label for="2">Maria</label>
-						</p>
-						<p>
-						<input type="checkbox" id="a3" name="a3" />
-						<label for="3">João</label>
-						</p>
+						{{ /animals }}
 					</div>
+					<br>
 					<div>
 						Remédio:
+						{{ #medicines }}
 						<p>
-						<input class="with-gap" name="m1" type="radio" id="m1"  />
-						<label for="m1">Ourovac® Aftosa</label>
+						<input type="checkbox" id="medicine-{{ID}}" name="Medicine" value="{{ID}}" />
+						<label for="medicine-{{ID}}">{{Name}}</label>
 						</p>
+						{{ /medicines }}
 					</div>
 					<div class="right-align">
 						<button class="btn waves-effect waves-light teal darken-3"

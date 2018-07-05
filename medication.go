@@ -4,17 +4,14 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
-type Medicine struct {
+type Medication struct {
 	ID          int
-	Name        string
-	Date        mysql.NullTime
 	Description string
-	Animals     []Animal `gorm:"many2many:medication_animal"`
-	Medicines   []Animal `gorm:"many2many:medication_medicine"`
-
-	TypeID int
+	Date        mysql.NullTime
+	Animals     []Animal   `gorm:"many2many:medication_animal"`
+	Medicines   []Medicine `gorm:"many2many:medication_medicine"`
 }
 
-func (m Medicine) DateFmt() string {
-	return m.Expiration.Time.Format("02/01/2006")
+func (m Medication) DateFmt() string {
+	return m.Date.Time.Format("02/01/2006")
 }

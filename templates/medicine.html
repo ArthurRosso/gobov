@@ -27,16 +27,16 @@
 				data-activates="mobile-demo" class="button-collapse"><i
 				class="material-icons">menu</i></a>
 				<ul class="right hide-on-med-and-down">
-					<li><a href="animal">Animal</a></li>
-					<li><a href="medicine">Medicine</a></li>
-					<li><a href="medication">Medication</a></li>
-					<li><a href="login">Sair</a></li>
+					<li><a href="/animal">Animal</a></li>
+					<li><a href="/medicine">Medicine</a></li>
+					<li><a href="/medication">Medication</a></li>
+					<li><a href="/login">Sair</a></li>
 				</ul>
 				<ul class="side-nav" id="mobile-demo">
-					<li><a href="animal">Animal</a></li>
-					<li><a href="medicine">Medicine</a></li>
-					<li><a href="medication">Medication</a></li>
-					<li><a href="login">Logout</a></li>
+					<li><a href="/animal">Animal</a></li>
+					<li><a href="/medicine">Medicine</a></li>
+					<li><a href="/medication">Medication</a></li>
+					<li><a href="/login">Logout</a></li>
 				</ul>
 			</div>
 		</nav>
@@ -46,7 +46,7 @@
 	<div class="row">
 		<div class="container">
 			<div class="card-panel">
-				<form method="post" action="/newMedicine" >
+				<form method="post" action="/newMedicine" enctype="multipart/form-data" >
 					<div class="row">
 						<div class="input-field col s3">
 							Nome: <input type="text" name="Name" />
@@ -69,10 +69,10 @@
 							<div class="file-field input-field">
 								<div class="btn teal darken-3">
 									<span>Fotos</span>
-									<input name="Picture" type="file" multiple>
+									<input name="Picture" type="file" >
 								</div>
 								<div class="file-path-wrapper">
-									<input class="file-path validate" name="Picture" type="text" placeholder="Uma ou mais fotos.">
+									<input class="file-path validate" name="Picture" type="text" placeholder="Uma foto.">
 								</div>
 							</div>
 						</div>
@@ -91,12 +91,10 @@
 				<div class="col s12 m6 l3">
 					<div class="card sticky-action" style="overflow: visible;">
 						<div class="card-image waves-effect waves-block waves-light">
-							<img class="activator" src="" style="width:100px">
+							<img class="activator" src="/picMedicine/{{ID}}" style="width:100px">
 						</div>
 						<div class="card-content">
 							<span class="card-title activator grey-text text-darken-4">{{Name}}<i class="material-icons right">more_vert</i></span>
-
-							<p><a href="remedio - Ourovac® Aftosa.html">Show {{Name}}</a></p>
 						</div>
 
 						<div class="card-action">

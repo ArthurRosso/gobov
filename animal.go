@@ -6,19 +6,24 @@ import (
 )
 
 type Animal struct {
-	ID       int
-	Name     string
-	Active   bool
-	Birthday mysql.NullTime
-	Weights  []Weight
-	Type     *TypeAnimal
-	Breed    *Breed
-	Purposes []Purpose `gorm:"many2many:animal_purpose"`
-	Pictures []Picture
-	Medications    []Medication `gorm:"many2many:medication_animal"`
+	ID          int
+	Name        string
+	Active      bool
+	Birthday    mysql.NullTime
+	Weights     []Weight
+	Type        *TypeAnimal
+	Breed       *Breed
+	Purposes    []Purpose `gorm:"many2many:animal_purpose"`
+	Pictures    []Picture
+	Medications []Medication `gorm:"many2many:medication_animal"`
+	Mother      *Animal
+	Father      *Animal
+	Sons        []Animal
 
-	TypeID  int
-	BreedID int
+	MotherID int
+	FatherID int
+	TypeID   int
+	BreedID  int
 }
 
 func NewAnimal() Animal {

@@ -11,7 +11,7 @@ type Medicine struct {
 	Expiration  mysql.NullTime
 	Description string
 	Type        *TypeMedicine
-	Picture     []byte `gorm:"type:mediumblob"`
+	Picture     []byte       `gorm:"type:mediumblob"`
 	Medications []Medication `gorm:"many2many:medication_medicine"`
 
 	TypeID int

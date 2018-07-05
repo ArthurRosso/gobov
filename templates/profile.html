@@ -28,16 +28,16 @@
 							   data-activates="mobile-demo" class="button-collapse"><i
 				       class="material-icons">menu</i></a>
 					<ul class="right hide-on-med-and-down">
-						<li><a href="animal">Animal</a></li>
-						<li><a href="medicine">Medicine</a></li>
-						<li><a href="medication">Medication</a></li>
-						<li><a href="login.html">Sair</a></li>
+						<li><a href="/animal">Animal</a></li>
+						<li><a href="/medicine">Medicine</a></li>
+						<li><a href="/medication">Medication</a></li>
+						<li><a href="/login">Sair</a></li>
 					</ul>
 					<ul class="side-nav" id="mobile-demo">
 						<li><a href="/animal">Animal</a></li>
 						<li><a href="/medicine">Medicine</a></li>
-						<li><a href="medication.html">Medication</a></li>
-						<li><a href="login.html">Logout</a></li>
+						<li><a href="/medication">Medication</a></li>
+						<li><a href="/login">Logout</a></li>
 					</ul>
 				</div>
 			</nav>
@@ -51,13 +51,11 @@
 				<div class="fixed-action-btn">
 					<a class="btn-floating btn-large teal darken-4">
 						<i class="large material-icons">mode_edit</i>
-
 					</a>
 					<ul>
-						<li><a class="btn-floating red"><i class="material-icons">insert_chart</i></a>editar animal</li>
-						<li><a class="btn-floating yellow darken-1"><i class="material-icons">format_quote</i></a>atulizar peso</li>
-						<li><a class="btn-floating green"><i class="material-icons">publish</i></a>scoorr</li>
-						<li><a class="btn-floating blue"><i class="material-icons">attach_file</i></a>sla?</li>
+						<li><a href="" class="btn-floating red"><i class="material-icons">edit</i></a>editar animal</li>
+						<li><a href="" class="btn-floating yellow darken-1"><i class="material-icons">publish</i></a>atuializar peso</li>
+						<li><a href="" class="btn-floating green"><i class="material-icons">insert_chart</i></a>visualizar relatórios</li>
 					</ul>
 				</div>
 
@@ -65,7 +63,7 @@
 				<div class="row">
 					<div class="card-panel">
 						<div class="center-align">
-							<img src="/pic/{{animal.ID}}" alt="Avatar" style="width:200px">
+							<img src="/pic/{{animal.MainPic.ID}}" alt="Avatar" style="width:200px">
 						</div>
 						<div class="center-align">
 							<span>{{animal.Name}}</span>  
@@ -90,12 +88,12 @@
 						<div class="row">
 
 							<div class="col s6">
-								<p>Father:</p>
-								<img src="https://i.pinimg.com/originals/47/77/b3/4777b31f72a32030d87951766aadd636.jpg" style="width:100px">
+								<p>Father: {{animal.Father.Name}}</p>
+								<img src="/pic/{{animal.Father.MainPic.ID}}" style="width:100px">
 							</div>
 							<div class="col s6">
 								<p>Mother:</p>
-								<img src="http://www.cattle-exchange.com/sites/default/files/styles/galleryformatter_slide/public/700x437xbreed,P20angus.jpg,qitok=FlUy9hKa.pagespeed.ic.WhGjjGjtZc.jpg" style="width:100px">
+								<img src="/pic/{{animal.Mother.MainPic.ID}}" style="width:100px">
 							</div>
 						</div>
 					</div>
@@ -105,13 +103,7 @@
 							<h5>Photos:</h5>
 						</div>
 						<div class="row">
-							<img src="http://ruralpecuaria.com.br/painel/img/noticias/533/noticias_1406497986.jpg" style="width:250px">
-
-							<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRyyPjqnupGuyf7VL-zLglLWDkKmwroK_Ex45mpONEc6yveDJoX" style="width:250px">
-
-							<img src="https://imagens.mfrural.com.br/mfrural-produtos-us/90411-220320-1143624-touro-black-angus-vpj-halley-199_p.jpg" style="width:250px">
-
-							<img src="http://www.guaranoticias.com.br/conteudo/7a067ac148cc86a3401f93ef6742bfe5.jpg" style="width:250px">
+							<img src="/pic/{{animal.MainPic.ID}}" style="width:250px">
 						</div>
 					</div>
 
@@ -121,43 +113,6 @@
 			</div>
 
 			<div class="col s12 m8 l9"> <!-- Note that "m8 l9" was added -->
-
-				<div class="card horizontal">
-					<div class="card-image">
-						<div class="row">
-
-							<div class="col s6">
-								<img src="http://ruralpecuaria.com.br/painel/img/noticias/533/noticias_1406497986.jpg" style="width:200px">
-							</div>
-							<div class="col s6">
-								<img src="http://ourofinosaudeanimal.com/media/uploads/produtos/2018/Ourovac_Aftosa_50ml_OF45.png" style="width:200px">
-							</div>
-
-						</div>
-					</div>
-					<div class="card-stacked">
-						<div class="card-content">
-							<p>New medication of José with Ourovac® Aftosa!</p>
-						</div>
-						<div class="card-action">
-							<a href="animal - José.html">Show José</a>
-						</div>
-					</div>
-				</div>
-
-				<div class="card horizontal">
-					<div class="card-image">
-						<img src="http://ruralpecuaria.com.br/painel/img/noticias/533/noticias_1406497986.jpg" style="width:200px">
-					</div>
-					<div class="card-stacked">
-						<div class="card-content">
-							<p>José added successfully!</p>
-						</div>
-						<div class="card-action">
-							<a href="animal - José.html">Show José</a>
-						</div>
-					</div>
-				</div>
 
 			</div>
 
