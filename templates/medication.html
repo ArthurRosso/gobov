@@ -15,6 +15,12 @@
 		<link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css" />
 
+	<style type="text/css">
+		ol {
+  			list-style-type: disc; 
+  		}
+	</style>
+
 
 	</head>
 	<body>
@@ -74,6 +80,41 @@
 						</button>
 					</div>
 				</form>
+			</div>
+
+			<div class="col s12 m8 l9"> <!-- Note that "m8 l9" was added -->
+
+				{{ #medications }}
+				<div class="card horizontal">
+					<div class="card-image">
+						<div class="row">
+
+							<div class="col s6">
+								{{ #animals }}
+								<img src="/pic/{{MainPic.ID}}" style="width:100px"/>
+								{{ /animals }} 
+							</div>
+							<div class="col s6">
+								{{ #medicines }}
+								<img src="/picMedicine/{{ID}}" style="width:100px"/>
+								{{ /medicines }} 
+							</div>
+
+						</div>
+					</div>
+					<div class="card-stacked">
+						<div class="card-content">
+							<p>Os animals: </p>
+								<ol>{{ #animals }}<li>{{Name}}</li>{{ /animals }}</ol>
+							<p>Foram medicados com:</p>
+								<ol>{{ #medicines }}<li>{{Name}}</li>{{ /medicines }}</ol>
+						</div>
+						<div class="card-action">
+							{{ #animals }}<a href="/profile/{{ID}}">Show {{Name}}</a>{{ /animals }}
+						</div>
+					</div>
+				</div>
+				{{ /medications }}
 			</div>
 
 		</div>

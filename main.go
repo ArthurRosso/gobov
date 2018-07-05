@@ -57,9 +57,6 @@ func getPic(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// TODO: getFatherPic
-// TODO: getMotherPic
-
 func getMedicinePic(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	medicine := Medicine{}
@@ -232,7 +229,7 @@ func getProfile(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idAnimal, _ := strconv.Atoi(vars["idAnimal"])
 	animal := Animal{}
-	db.Preload("Weights").Preload("Type").Preload("Breed").Preload("Purposes").First(&animal, idAnimal)
+	db.Preload("Weights").Preload("Type").Preload("Breed").Preload("Purposes").Preload("Father").Preload("Mother").First(&animal, idAnimal)
 
 	context := map[string]interface{}{
 		"animal": animal,
