@@ -57,6 +57,6 @@ func (a Animal) PurposesFmt() string {
 
 func (a Animal) MainPic() Picture {
 	pic := Picture{}
-	db.Where("main=?", 1).First(&pic)
+	db.Where("main=? and animal_id=?", 1, a.ID).First(&pic)
 	return pic
 }

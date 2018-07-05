@@ -88,12 +88,12 @@
 						<div class="row">
 
 							<div class="col s6">
-								<p>Father: {{animal.Father.Name}}</p>
-								<img src="/pic/{{animal.Father.MainPic.ID}}" style="width:100px">
+								<a href="/profile/{{animal.Father.ID}}" ><p>Father: {{animal.Father.Name}}</p>
+								<img src="/pic/{{animal.Father.MainPic.ID}}" style="width:100px"></a>
 							</div>
 							<div class="col s6">
-								<p>Mother:</p>
-								<img src="/pic/{{animal.Mother.MainPic.ID}}" style="width:100px">
+								<a href="/profile/{{animal.Mother.ID}}" > <p>Mother: {{animal.Mother.Name}}</p>
+								<img src="/pic/{{animal.Mother.MainPic.ID}}" style="width:100px"></a>
 							</div>
 						</div>
 					</div>
