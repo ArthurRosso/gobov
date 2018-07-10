@@ -29,15 +29,15 @@
 				       class="material-icons">menu</i></a>
 					<ul class="right hide-on-med-and-down">
 						<li><a href="/animal">Animal</a></li>
-						<li><a href="/medicine">Medicine</a></li>
-						<li><a href="/medication">Medication</a></li>
+						<li><a href="/medicine">Remédio</a></li>
+						<li><a href="/medication">Medicação</a></li>
 						<li><a href="/login">Sair</a></li>
 					</ul>
 					<ul class="side-nav" id="mobile-demo">
 						<li><a href="/animal">Animal</a></li>
-						<li><a href="/medicine">Medicine</a></li>
-						<li><a href="/medication">Medication</a></li>
-						<li><a href="/login">Logout</a></li>
+						<li><a href="/medicine">Remédio</a></li>
+						<li><a href="/medication">Medicação</a></li>
+						<li><a href="/login">Sair</a></li>
 					</ul>
 				</div>
 			</nav>
@@ -54,7 +54,7 @@
 					</a>
 					<ul>
 						<li><a href="" class="btn-floating red"><i class="material-icons">edit</i></a>editar animal</li>
-						<li><a href="" class="btn-floating yellow darken-1"><i class="material-icons">publish</i></a>atuializar peso</li>
+						<li><a href="" class="btn-floating yellow darken-1"><i class="material-icons">publish</i></a>atualizar peso</li>
 						<li><a href="" class="btn-floating green"><i class="material-icons">insert_chart</i></a>visualizar relatórios</li>
 					</ul>
 				</div>
@@ -83,16 +83,16 @@
 
 					<div class="card-panel">
 						<div class="center-align">
-							<h5>Genealogy:</h5>
+							<h5>Genealogia:</h5>
 						</div>
 						<div class="row">
 
 							<div class="col s6">
-								<a href="/profile/{{animal.Father.ID}}" ><p>Father: {{animal.Father.Name}}</p>
+								<a href="/profile/{{animal.Father.ID}}" ><p>Pai: {{animal.Father.Name}}</p>
 								<img src="/pic/{{animal.Father.MainPic.ID}}" style="width:100px"></a>
 							</div>
 							<div class="col s6">
-								<a href="/profile/{{animal.Mother.ID}}" > <p>Mother: {{animal.Mother.Name}}</p>
+								<a href="/profile/{{animal.Mother.ID}}" > <p>Mãe: {{animal.Mother.Name}}</p>
 								<img src="/pic/{{animal.Mother.MainPic.ID}}" style="width:100px"></a>
 							</div>
 						</div>
@@ -100,7 +100,7 @@
 
 					<div class="card-panel">
 						<div class="center-align">
-							<h5>Photos:</h5>
+							<h5>Fotos:</h5>
 						</div>
 						<div class="row">
 							<img src="/pic/{{animal.MainPic.ID}}" style="width:250px">
