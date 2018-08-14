@@ -216,15 +216,7 @@ func delAnimal(w http.ResponseWriter, r *http.Request) {
 	animal := Animal{ID: id}
 
 	db.Preload("Medications").Preload("Purposes").First(&animal)
-
-	idsMedication := []int{}
-	for _, med := range animal.Medications{
-		if len(med.Animals) <= 1{
-			idsMedication = append(idsMedication, med.ID)
-		}
-	}
-	db.Where("ID in (?)", idsMedication).Delete(&Medication{})
-
+	
 	db.Exec("DELETE FROM weights WHERE animal_id=?", id)
 	db.Exec("DELETE FROM animal_purpose WHERE animal_id=?", id)
 	db.Exec("DELETE FROM medication_animal WHERE animal_id=?", id)
@@ -315,9 +307,11 @@ func editAnimal(w http.ResponseWriter, r *http.Request) {
 
 func delMedicine(w http.ResponseWriter, r *http.Request) {
 	m := mux.Vars(r)
-	id := m["ID"]
-	// TODO: A próxima linha não funciona, então possívelmente a linha 202 também não
-	db.Model(&Medication{}).Where("medicine_id = ?", id).Association("medication_medicine").Delete(&Medication{})
+	id, _ := strconv.Atoi(m["ID"])
+	medicine := Medicine{ID: id}
+	db.Preload("Medications").First(&medicine)
+	
+	db.Exec("DELETE FROM medication_medicine WHERE medicine_id=?", id)
 	db.Where("ID = ?", id).Delete(&Medicine{})
 
 	http.Redirect(w, r, "/medicine", http.StatusMovedPermanently)
