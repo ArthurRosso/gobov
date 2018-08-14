@@ -29,6 +29,9 @@ func main() {
 	db.AutoMigrate(&Picture{})
 	db.AutoMigrate(&Medication{})
 
+	//Data()
+	//DataM()
+
 	r := mux.NewRouter()
 
 	r.HandleFunc("/pic/{idAnimal}", getPic)
@@ -209,15 +212,25 @@ func postAnimal(w http.ResponseWriter, r *http.Request) {
 
 func delAnimal(w http.ResponseWriter, r *http.Request) {
 	m := mux.Vars(r)
-	id := m["ID"]
+	id, _ := strconv.Atoi(m["ID"])
+	animal := Animal{ID: id}
 
-	// TODO: Delete Weights
-	// TODO: Ver a linha 291
+	db.Preload("Medications").Preload("Purposes").First(&animal)
 
-	//db.Model(&Medication{}).Where("animal_id = ?", id).Association("medication_animal").Delete(&Medication{})
-	//db.Model(&Purpose{}).Where("animal_id = ?", id).Association("animal_purpose").Delete()// TODO: O que colocar e como
+	idsMedication := []int{}
+	for _, med := range animal.Medications{
+		if len(med.Animals) <= 1{
+			idsMedication = append(idsMedication, med.ID)
+		}
+	}
+	db.Where("ID in (?)", idsMedication).Delete(&Medication{})
+
+	db.Exec("DELETE FROM weights WHERE animal_id=?", id)
+	db.Exec("DELETE FROM animal_purpose WHERE animal_id=?", id)
+	db.Exec("DELETE FROM medication_animal WHERE animal_id=?", id)
+
 	db.Where("animal_id = ?", id).Delete(&Picture{})
-	db.Where("ID = ?", id).Delete(&Animal{})
+	db.Delete(&animal)
 
 	http.Redirect(w, r, "/animal", http.StatusMovedPermanently)
 }
