@@ -42,16 +42,12 @@ func main() {
 	r.HandleFunc("/animal", getAnimal)
 	r.HandleFunc("/newAnimal", postAnimal)
 	r.HandleFunc("/delAnimal/{ID}", delAnimal)
-	/*
-	r.HandleFunc("/editAnimal/{ID}", editAnimal)
-	*/
+	//r.HandleFunc("/editAnimal/{ID}", editAnimal)
 	
 	
 	r.HandleFunc("/weight/{idAnimal}", getWeight)
 	r.HandleFunc("/newWeight/{idAnimal}", postWeight)
-	/*
-	r.HandleFunc("/delWeight/{ID}", delWeight)
-	*/
+	r.HandleFunc("/delWeight/{idWeight}", delWeight)
 
 	r.HandleFunc("/medicine", getMedicine)
 	r.HandleFunc("/newMedicine", postMedicine)
@@ -113,6 +109,19 @@ func postWeight(w http.ResponseWriter, r *http.Request) {
 	db.Save(&weight)
 
 	url := "/weight/"+vars["idAnimal"]
+
+	http.Redirect(w, r, url, http.StatusMovedPermanently)
+}
+
+func delWeight(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	idWeight, _ := strconv.Atoi(vars["idWeight"])
+	weight := Weight{}
+	db.Find(&weight, idWeight)
+	id := strconv.Itoa(weight.AnimalID)
+	db.Delete(&weight)
+
+	url := "/weight/"+id
 
 	http.Redirect(w, r, url, http.StatusMovedPermanently)
 }
