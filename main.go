@@ -48,8 +48,8 @@ func main() {
 	
 	
 	r.HandleFunc("/weight/{idAnimal}", getWeight)
+	r.HandleFunc("/newWeight/{idAnimal}", postWeight)
 	/*
-	r.HandleFunc("/newWeight", postWeight)
 	r.HandleFunc("/delWeight/{ID}", delWeight)
 	*/
 
@@ -78,18 +78,45 @@ func getIndex (w http.ResponseWriter, r *http.Request) {
 func getWeight(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idAnimal, _ := strconv.Atoi(vars["idAnimal"])
+	animal := Animal{ID: idAnimal}
 
 	weights := []Weight{}
-	db.Find(&weights, idAnimal)
+	db.Where("animal_id = ?", idAnimal).Find(&weights)
 
 	context := map[string]interface{}{
 		"weights": weights,
+		"animal": animal,
 	}
 
 	str, _ := mustache.RenderFile("templates/weight.html", context)
 	bit := []byte(str)
 	w.Write(bit)
 }
+
+
+func postWeight(w http.ResponseWriter, r *http.Request) {
+	weight := Weight{}
+	peso, _ := strconv.ParseFloat(r.PostFormValue("Weight"), 32)
+	weight.Weight = float32(peso)
+	weight.Description = r.PostFormValue("Description")
+
+	date, _ := time.Parse("2006-01-02", r.PostFormValue("Date"))
+	weight.Date = mysql.NullTime{Time: date, Valid: true}
+
+	vars := mux.Vars(r)
+	idAnimal, _ := strconv.Atoi(vars["idAnimal"])
+	animal := Animal{}
+	db.First(&animal, idAnimal)
+
+	weight.Animal = &animal
+
+	db.Save(&weight)
+
+	url := "/weight/"+vars["idAnimal"]
+
+	http.Redirect(w, r, url, http.StatusMovedPermanently)
+}
+
 
 func getPic(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -182,11 +209,14 @@ func getAnimal(w http.ResponseWriter, r *http.Request) {
 			animal.Father = &father
 		}
 
-		weight := Weight{Description: "Primeira pesagem"}
-
 		birth, _ := time.Parse("2006-01-02", r.PostFormValue("Birthday"))
-		animal.Birthday = mysql.NullTime{Time: birth, Valid: true}
+		b := mysql.NullTime{Time: birth, Valid: true}
+		animal.Birthday = b
 
+		weight := Weight{
+			Description: "Primeira pesagem",
+			Date: b,
+		}
 		peso, _ := strconv.ParseFloat(r.PostFormValue("Weight"), 32)
 		weight.Weight = float32(peso)
 		animal.Weights = append(animal.Weights, weight)
@@ -313,67 +343,52 @@ func getAnimal(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/medicine", http.StatusMovedPermanently)
 	}
 
-// TODO: Não testado
-/*
-func getWeight(w http.ResponseWriter, r *http.Request) {
-	weights := []Weight{}
-	db.Find(&weights, Weight{})
 
-	context := map[string]interface{}{
-		"weights":     weights,
+	func getMedication(w http.ResponseWriter, r *http.Request) {
+		medications := []Medication{}
+		db.Preload("Animals").Preload("Medicines").Find(&medications, Medication{})
+
+		animals := []Animal{}
+		db.Find(&animals, &Animal{})
+
+		medicines := []Medicine{}
+		db.Find(&medicines, &Medicine{})
+
+		context := map[string]interface{}{
+			"animals": animals,
+			"medicines": medicines,
+			"medications": medications,
+		}
+
+		str, _ := mustache.RenderFile("templates/medication.html", context)
+		bit := []byte(str)
+		w.Write(bit)
 	}
 
-	str, _ := mustache.RenderFile("templates/weight.html", context)
-	bit := []byte(str)
-	w.Write(bit)
-}
-*/
+	func postMedication(w http.ResponseWriter, r *http.Request) {	
+		medication := Medication{}
+		medication.Description = r.PostFormValue("Description")
 
-func getMedication(w http.ResponseWriter, r *http.Request) {
-	medications := []Medication{}
-	db.Preload("Animals").Preload("Medicines").Find(&medications, Medication{})
+		date, _ := time.Parse("2006-01-02", r.PostFormValue("Date"))
+		medication.Date = mysql.NullTime{Time: date, Valid: true}
 
-	animals := []Animal{}
-	db.Find(&animals, &Animal{})
+		r.ParseForm()
+		for _, idAnimals := range r.Form["Animal"] {
+			animal := Animal{}
+			id, _ := strconv.Atoi(idAnimals)
+			db.Find(&animal, id)
+			medication.Animals = append(medication.Animals, animal)
+		}
 
-	medicines := []Medicine{}
-	db.Find(&medicines, &Medicine{})
+		r.ParseForm()
+		for _, idMedicines := range r.Form["Medicine"] {
+			medicine := Medicine{}
+			id, _ := strconv.Atoi(idMedicines)
+			db.Find(&medicine, id)
+			medication.Medicines = append(medication.Medicines, medicine)
+		}
 
-	context := map[string]interface{}{
-		"animals": animals,
-		"medicines": medicines,
-		"medications": medications,
+		db.Save(&medication)
+
+		http.Redirect(w, r, "/medication", http.StatusMovedPermanently)
 	}
-
-	str, _ := mustache.RenderFile("templates/medication.html", context)
-	bit := []byte(str)
-	w.Write(bit)
-}
-
-func postMedication(w http.ResponseWriter, r *http.Request) {	
-	medication := Medication{}
-	medication.Description = r.PostFormValue("Description")
-
-	date, _ := time.Parse("2006-01-02", r.PostFormValue("Date"))
-	medication.Date = mysql.NullTime{Time: date, Valid: true}
-
-	r.ParseForm()
-	for _, idAnimals := range r.Form["Animal"] {
-		animal := Animal{}
-		id, _ := strconv.Atoi(idAnimals)
-		db.Find(&animal, id)
-		medication.Animals = append(medication.Animals, animal)
-	}
-
-	r.ParseForm()
-	for _, idMedicines := range r.Form["Medicine"] {
-		medicine := Medicine{}
-		id, _ := strconv.Atoi(idMedicines)
-		db.Find(&medicine, id)
-		medication.Medicines = append(medication.Medicines, medicine)
-	}
-
-	db.Save(&medication)
-
-	http.Redirect(w, r, "/medication", http.StatusMovedPermanently)
-}
