@@ -12,5 +12,9 @@ type Weight struct {
 	Date        mysql.NullTime
 	Animal      *Animal
 
-	AnimalID int
+	AnimalID 	int
+}
+
+func (w Weight) DateFmt() string {
+	return w.Date.Time.Format("02/01/2006")
 }

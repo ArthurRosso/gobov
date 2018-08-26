@@ -1,15 +1,15 @@
 package main
 
 import (
-	"fmt"
-	"github.com/cbroglie/mustache"
-	"github.com/go-sql-driver/mysql"
-	"github.com/gorilla/mux"
-	"github.com/jinzhu/gorm"
-	"io/ioutil"
-	"net/http"
-	"strconv"
-	"time"
+"fmt"
+"github.com/cbroglie/mustache"
+"github.com/go-sql-driver/mysql"
+"github.com/gorilla/mux"
+"github.com/jinzhu/gorm"
+"io/ioutil"
+"net/http"
+"strconv"
+"time"
 )
 
 var (
@@ -34,6 +34,8 @@ func main() {
 
 	r := mux.NewRouter()
 
+	r.HandleFunc("/}", getIndex)
+
 	r.HandleFunc("/pic/{idAnimal}", getPic)
 	r.HandleFunc("/picMedicine/{idMedicine}", getMedicinePic)
 
@@ -44,8 +46,9 @@ func main() {
 	r.HandleFunc("/editAnimal/{ID}", editAnimal)
 	*/
 	
+	
+	r.HandleFunc("/weight/{idAnimal}", getWeight)
 	/*
-	r.HandleFunc("/weight", getWeight)
 	r.HandleFunc("/newWeight", postWeight)
 	r.HandleFunc("/delWeight/{ID}", delWeight)
 	*/
@@ -62,6 +65,30 @@ func main() {
 	fmt.Println("Server listen and serve on port 8000")
 
 	http.ListenAndServe(":8000", r)
+}
+
+func getIndex (w http.ResponseWriter, r *http.Request) {
+	context := map[string]interface{}{}
+
+	str, _ := mustache.RenderFile("templates/index.html", context)
+	bit := []byte(str)
+	w.Write(bit)
+}
+
+func getWeight(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	idAnimal, _ := strconv.Atoi(vars["idAnimal"])
+
+	weights := []Weight{}
+	db.Find(&weights, idAnimal)
+
+	context := map[string]interface{}{
+		"weights": weights,
+	}
+
+	str, _ := mustache.RenderFile("templates/weight.html", context)
+	bit := []byte(str)
+	w.Write(bit)
 }
 
 func getPic(w http.ResponseWriter, r *http.Request) {
@@ -109,260 +136,182 @@ func getAnimal(w http.ResponseWriter, r *http.Request) {
 		// element is the element from someSlice for where we are
 		if i.Type.Type == "Touro" {
 			fathers = append(fathers, i)
-		} else if i.Type.Type == "Vaca" {
-			mothers = append(mothers, i)
+			} else if i.Type.Type == "Vaca" {
+				mothers = append(mothers, i)
+			}
 		}
+
+		types := []TypeAnimal{}
+		db.Find(&types, &TypeAnimal{})
+
+		breeds := []Breed{}
+		db.Find(&breeds, &Breed{})
+
+		purposes := []Purpose{}
+		db.Find(&purposes, &Purpose{})
+
+		context := map[string]interface{}{
+			"types":    types,
+			"breeds":   breeds,
+			"purposes": purposes,
+			"animals":  animals,
+			"mothers":  mothers,
+			"fathers":  fathers,
+		}
+
+		str, _ := mustache.RenderFile("templates/animal.html", context)
+		bit := []byte(str)
+		w.Write(bit)
 	}
 
-	types := []TypeAnimal{}
-	db.Find(&types, &TypeAnimal{})
+	func postAnimal(w http.ResponseWriter, r *http.Request) {
+		animal := NewAnimal()
+		animal.Name = r.PostFormValue("Name")
 
-	breeds := []Breed{}
-	db.Find(&breeds, &Breed{})
+		motherID, _ := strconv.Atoi(r.PostFormValue("Mother"))
+		if motherID != 0 {
+			mother := Animal{}
+			db.Find(&mother, Animal{ID: motherID})
+			animal.Mother = &mother
+		}
 
-	purposes := []Purpose{}
-	db.Find(&purposes, &Purpose{})
+		fatherID, _ := strconv.Atoi(r.PostFormValue("Father"))
+		if fatherID != 0 {
+			father := Animal{}
+			db.First(&father, Animal{ID: fatherID})
+			animal.Father = &father
+		}
 
-	context := map[string]interface{}{
-		"types":    types,
-		"breeds":   breeds,
-		"purposes": purposes,
-		"animals":  animals,
-		"mothers":  mothers,
-		"fathers":  fathers,
-	}
+		weight := Weight{Description: "Primeira pesagem"}
 
-	str, _ := mustache.RenderFile("templates/animal.html", context)
-	bit := []byte(str)
-	w.Write(bit)
-}
+		birth, _ := time.Parse("2006-01-02", r.PostFormValue("Birthday"))
+		animal.Birthday = mysql.NullTime{Time: birth, Valid: true}
 
-func postAnimal(w http.ResponseWriter, r *http.Request) {
-	animal := NewAnimal()
-	animal.Name = r.PostFormValue("Name")
+		peso, _ := strconv.ParseFloat(r.PostFormValue("Weight"), 32)
+		weight.Weight = float32(peso)
+		animal.Weights = append(animal.Weights, weight)
 
-	motherID, _ := strconv.Atoi(r.PostFormValue("Mother"))
-	if motherID != 0 {
-		mother := Animal{}
-		db.Find(&mother, Animal{ID: motherID})
-		animal.Mother = &mother
-	}
+		typeA := TypeAnimal{}
+		idType, _ := strconv.Atoi(r.PostFormValue("Type"))
+		db.Find(&typeA, idType)
+		animal.Type = &typeA
+		db.First(&animal.Type, idType)
 
-	fatherID, _ := strconv.Atoi(r.PostFormValue("Father"))
-	if fatherID != 0 {
-		father := Animal{}
-		db.First(&father, Animal{ID: fatherID})
-		animal.Father = &father
-	}
+		breed := Breed{}
+		idBreed, _ := strconv.Atoi(r.PostFormValue("Breed"))
+		db.Find(&breed, idBreed)
+		animal.Breed = &breed
+		db.First(&animal.Breed, idBreed)
 
-	weight := Weight{Description: "Primeira pesagem"}
-
-	birth, _ := time.Parse("2006-01-02", r.PostFormValue("Birthday"))
-	animal.Birthday = mysql.NullTime{Time: birth, Valid: true}
-
-	peso, _ := strconv.ParseFloat(r.PostFormValue("Weight"), 32)
-	weight.Weight = float32(peso)
-	animal.Weights = append(animal.Weights, weight)
-
-	typeA := TypeAnimal{}
-	idType, _ := strconv.Atoi(r.PostFormValue("Type"))
-	db.Find(&typeA, idType)
-	animal.Type = &typeA
-	db.First(&animal.Type, idType)
-
-	breed := Breed{}
-	idBreed, _ := strconv.Atoi(r.PostFormValue("Breed"))
-	db.Find(&breed, idBreed)
-	animal.Breed = &breed
-	db.First(&animal.Breed, idBreed)
-
-	r.ParseForm()
-	for _, idPurposes := range r.Form["Purpose"] {
+		r.ParseForm()
+		for _, idPurposes := range r.Form["Purpose"] {
 		// element is the element from someSlice for where we are
-		purpose := Purpose{}
-		id, _ := strconv.Atoi(idPurposes)
-		db.Find(&purpose, id)
-		animal.Purposes = append(animal.Purposes, purpose)
-	}
-
-	r.ParseMultipartForm(0)
-	m := r.MultipartForm
-
-	files := m.File["Pictures"]
-
-	db.Save(&animal)
-
-	if len(files) > 0 {
-		pic := Picture{Main: true, AnimalID: animal.ID}
-		arquivo, _ := files[0].Open()
-		pic.Picture, _ = ioutil.ReadAll(arquivo)
-		defer arquivo.Close()
-		db.Save(&pic)
-		for _, file := range files[1:] {
-			picture := Picture{AnimalID: animal.ID}
-			arquivo, _ := file.Open()
-			picture.Picture, _ = ioutil.ReadAll(arquivo)
-			defer arquivo.Close()
-			db.Save(&picture)
+			purpose := Purpose{}
+			id, _ := strconv.Atoi(idPurposes)
+			db.Find(&purpose, id)
+			animal.Purposes = append(animal.Purposes, purpose)
 		}
-	}
 
-	http.Redirect(w, r, "/animal", http.StatusMovedPermanently)
-}
+		r.ParseMultipartForm(0)
+		m := r.MultipartForm
 
-func delAnimal(w http.ResponseWriter, r *http.Request) {
-	m := mux.Vars(r)
-	id, _ := strconv.Atoi(m["ID"])
-	animal := Animal{ID: id}
+		files := m.File["Pictures"]
 
-	db.Preload("Medications").Preload("Purposes").First(&animal)
-	
-	db.Exec("DELETE FROM weights WHERE animal_id=?", id)
-	db.Exec("DELETE FROM animal_purpose WHERE animal_id=?", id)
-	db.Exec("DELETE FROM medication_animal WHERE animal_id=?", id)
+		db.Save(&animal)
 
-	db.Where("animal_id = ?", id).Delete(&Picture{})
-	db.Delete(&animal)
-
-	http.Redirect(w, r, "/animal", http.StatusMovedPermanently)
-}
-
-// TODO: Ñão testado
-/*
-func editAnimal(w http.ResponseWriter, r *http.Request) {
-	m := mux.Vars(r)
-	id := m["ID"]
-
-	animal.Name = r.PostFormValue("Name")
-
-	motherID, _ := strconv.Atoi(r.PostFormValue("Mother"))
-	if motherID != 0 {
-		mother := Animal{}
-		db.Find(&mother, Animal{ID: motherID})
-		animal.Mother = &mother
-	}
-
-	fatherID, _ := strconv.Atoi(r.PostFormValue("Father"))
-	if fatherID != 0 {
-		father := Animal{}
-		db.First(&father, Animal{ID: fatherID})
-		animal.Father = &father
-	}
-
-	weight := Weight{Description: "Primeira pesagem"}
-
-	birth, _ := time.Parse("2006-01-02", r.PostFormValue("Birthday"))
-	animal.Birthday = mysql.NullTime{Time: birth, Valid: true}
-
-	peso, _ := strconv.ParseFloat(r.PostFormValue("Weight"), 32)
-	weight.Weight = float32(peso)
-	animal.Weights = append(animal.Weights, weight)
-
-	typeA := TypeAnimal{}
-	idType, _ := strconv.Atoi(r.PostFormValue("Type"))
-	db.Find(&typeA, idType)
-	animal.Type = &typeA
-	db.First(&animal.Type, idType)
-
-	breed := Breed{}
-	idBreed, _ := strconv.Atoi(r.PostFormValue("Breed"))
-	db.Find(&breed, idBreed)
-	animal.Breed = &breed
-	db.First(&animal.Breed, idBreed)
-
-	r.ParseForm()
-	for _, idPurposes := range r.Form["Purpose"] {
-		// element is the element from someSlice for where we are
-		purpose := Purpose{}
-		id, _ := strconv.Atoi(idPurposes)
-		db.Find(&purpose, id)
-		animal.Purposes = append(animal.Purposes, purpose)
-	}
-
-	r.ParseMultipartForm(0)
-	m := r.MultipartForm
-
-	files := m.File["Pictures"]
-
-	db.Save(&animal)
-
-	if len(files) > 0 {
-		pic := Picture{Main: true, AnimalID: animal.ID}
-		arquivo, _ := files[0].Open()
-		pic.Picture, _ = ioutil.ReadAll(arquivo)
-		defer arquivo.Close()
-		db.Save(&pic)
-		for _, file := range files[1:] {
-			picture := Picture{AnimalID: animal.ID}
-			arquivo, _ := file.Open()
-			picture.Picture, _ = ioutil.ReadAll(arquivo)
+		if len(files) > 0 {
+			pic := Picture{Main: true, AnimalID: animal.ID}
+			arquivo, _ := files[0].Open()
+			pic.Picture, _ = ioutil.ReadAll(arquivo)
 			defer arquivo.Close()
-			db.Save(&picture)
+			db.Save(&pic)
+			for _, file := range files[1:] {
+				picture := Picture{AnimalID: animal.ID}
+				arquivo, _ := file.Open()
+				picture.Picture, _ = ioutil.ReadAll(arquivo)
+				defer arquivo.Close()
+				db.Save(&picture)
+			}
 		}
+
+		http.Redirect(w, r, "/animal", http.StatusMovedPermanently)
 	}
 
-	http.Redirect(w, r, "/profile/{ID}", http.StatusMovedPermanently)
-}
-*/
+	func delAnimal(w http.ResponseWriter, r *http.Request) {
+		m := mux.Vars(r)
+		id, _ := strconv.Atoi(m["ID"])
+		animal := Animal{ID: id}
 
-func delMedicine(w http.ResponseWriter, r *http.Request) {
-	m := mux.Vars(r)
-	id, _ := strconv.Atoi(m["ID"])
-	medicine := Medicine{ID: id}
-	db.Preload("Medications").First(&medicine)
-	
-	db.Exec("DELETE FROM medication_medicine WHERE medicine_id=?", id)
-	db.Where("ID = ?", id).Delete(&Medicine{})
+		db.Preload("Medications").Preload("Purposes").First(&animal)
 
-	http.Redirect(w, r, "/medicine", http.StatusMovedPermanently)
-}
+		db.Exec("DELETE FROM weights WHERE animal_id=?", id)
+		db.Exec("DELETE FROM animal_purpose WHERE animal_id=?", id)
+		db.Exec("DELETE FROM medication_animal WHERE animal_id=?", id)
 
-func getMedicine(w http.ResponseWriter, r *http.Request) {
-	medicines := []Medicine{}
-	db.Preload("Type").Find(&medicines, Medicine{})
+		db.Where("animal_id = ?", id).Delete(&Picture{})
+		db.Delete(&animal)
 
-	types := []TypeMedicine{}
-	db.Find(&types, &TypeMedicine{})
-
-	context := map[string]interface{}{
-		"types":     types,
-		"medicines": medicines,
+		http.Redirect(w, r, "/animal", http.StatusMovedPermanently)
 	}
 
-	str, _ := mustache.RenderFile("templates/medicine.html", context)
-	bit := []byte(str)
-	w.Write(bit)
-}
+	func delMedicine(w http.ResponseWriter, r *http.Request) {
+		m := mux.Vars(r)
+		id, _ := strconv.Atoi(m["ID"])
+		medicine := Medicine{ID: id}
+		db.Preload("Medications").First(&medicine)
 
-func postMedicine(w http.ResponseWriter, r *http.Request) {
-	medicine := NewMedicine()
-	medicine.Name = r.PostFormValue("Name")
+		db.Exec("DELETE FROM medication_medicine WHERE medicine_id=?", id)
+		db.Where("ID = ?", id).Delete(&Medicine{})
 
-	expiration, _ := time.Parse("2006-01-02", r.PostFormValue("Expiration"))
-	medicine.Expiration = mysql.NullTime{Time: expiration, Valid: true}
-
-	medicine.Description = r.PostFormValue("Description")
-
-	typeM := TypeMedicine{}
-	idType, _ := strconv.Atoi(r.PostFormValue("Type"))
-	db.Find(&typeM, idType)
-	medicine.Type = &typeM
-	db.First(&medicine.Type, idType)
-
-	r.ParseMultipartForm(0)
-	f := r.MultipartForm
-	if f == nil {
-		fmt.Println("Erro no formulário")
+		http.Redirect(w, r, "/medicine", http.StatusMovedPermanently)
 	}
-	file := f.File["Picture"]
-	arquivo, _ := file[0].Open()
-	medicine.Picture, _ = ioutil.ReadAll(arquivo)
-	defer arquivo.Close()
 
-	db.Save(&medicine)
+	func getMedicine(w http.ResponseWriter, r *http.Request) {
+		medicines := []Medicine{}
+		db.Preload("Type").Find(&medicines, Medicine{})
 
-	http.Redirect(w, r, "/medicine", http.StatusMovedPermanently)
-}
+		types := []TypeMedicine{}
+		db.Find(&types, &TypeMedicine{})
+
+		context := map[string]interface{}{
+			"types":     types,
+			"medicines": medicines,
+		}
+
+		str, _ := mustache.RenderFile("templates/medicine.html", context)
+		bit := []byte(str)
+		w.Write(bit)
+	}
+
+	func postMedicine(w http.ResponseWriter, r *http.Request) {
+		medicine := NewMedicine()
+		medicine.Name = r.PostFormValue("Name")
+
+		expiration, _ := time.Parse("2006-01-02", r.PostFormValue("Expiration"))
+		medicine.Expiration = mysql.NullTime{Time: expiration, Valid: true}
+
+		medicine.Description = r.PostFormValue("Description")
+
+		typeM := TypeMedicine{}
+		idType, _ := strconv.Atoi(r.PostFormValue("Type"))
+		db.Find(&typeM, idType)
+		medicine.Type = &typeM
+		db.First(&medicine.Type, idType)
+
+		r.ParseMultipartForm(0)
+		f := r.MultipartForm
+		if f == nil {
+			fmt.Println("Erro no formulário")
+		}
+		file := f.File["Picture"]
+		arquivo, _ := file[0].Open()
+		medicine.Picture, _ = ioutil.ReadAll(arquivo)
+		defer arquivo.Close()
+
+		db.Save(&medicine)
+
+		http.Redirect(w, r, "/medicine", http.StatusMovedPermanently)
+	}
 
 // TODO: Não testado
 /*
@@ -410,7 +359,6 @@ func postMedication(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseForm()
 	for _, idAnimals := range r.Form["Animal"] {
-		// element is the element from someSlice for where we are
 		animal := Animal{}
 		id, _ := strconv.Atoi(idAnimals)
 		db.Find(&animal, id)
@@ -419,7 +367,6 @@ func postMedication(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseForm()
 	for _, idMedicines := range r.Form["Medicine"] {
-		// element is the element from someSlice for where we are
 		medicine := Medicine{}
 		id, _ := strconv.Atoi(idMedicines)
 		db.Find(&medicine, id)

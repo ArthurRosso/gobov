@@ -1,133 +1,135 @@
 <!DOCTYPE html>
 <html xmlns:th="http://thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
-	<head>
+xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
 
-		<title>Sisboi - Animal Profile</title>
+	<title>Sisboi - Animal Profile</title>
 
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-		<!--Import Google Icon Font-->
-		<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+	<!--Import Google Icon Font-->
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
 	rel="stylesheet" />
 
-		<!--Import materialize.css-->
-		<link rel="stylesheet"
+	<!--Import materialize.css-->
+	<link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css" />
 
-	</head>
+</head>
 
-	<body>
+<body>
 
-		<header>
+	<header>
 
-			<nav class="teal darken-4">
-				<div class="nav-wrapper">
-					<a href="/" class="brand-logo">GoBov</a> <a href="/"
-							   data-activates="mobile-demo" class="button-collapse"><i
-				       class="material-icons">menu</i></a>
-					<ul class="right hide-on-med-and-down">
-						<li><a href="/animal">Animal</a></li>
-						<li><a href="/medicine">Remédio</a></li>
-						<li><a href="/medication">Medicação</a></li>
-						<li><a href="/login">Sair</a></li>
-					</ul>
-					<ul class="side-nav" id="mobile-demo">
-						<li><a href="/animal">Animal</a></li>
-						<li><a href="/medicine">Remédio</a></li>
-						<li><a href="/medication">Medicação</a></li>
-						<li><a href="/login">Sair</a></li>
-					</ul>
-				</div>
-			</nav>
+		<nav class="teal darken-4">
+			<div class="nav-wrapper">
+				<a href="/" class="brand-logo">GoBov</a> <a href="/"
+				data-activates="mobile-demo" class="button-collapse"><i
+				class="material-icons">menu</i></a>
+				<ul class="right hide-on-med-and-down">
+					<li><a href="/animal">Animal</a></li>
+					<li><a href="/medicine">Remédio</a></li>
+					<li><a href="/medication">Medicação</a></li>
+					<li><a href="/login">Sair</a></li>
+				</ul>
+				<ul class="side-nav" id="mobile-demo">
+					<li><a href="/animal">Animal</a></li>
+					<li><a href="/medicine">Remédio</a></li>
+					<li><a href="/medication">Medicação</a></li>
+					<li><a href="/login">Sair</a></li>
+				</ul>
+			</div>
+		</nav>
 
-		</header>
+	</header>
 
-		<!-- Page Layout here -->
-		<div class="row">
+	<!-- Page Layout here -->
+	<div class="row">
 
-			<div class="col s12 m4 l3"> <!-- Note that "m4 l3" was added -->
-				<div class="fixed-action-btn">
-					<a class="btn-floating btn-large teal darken-4">
-						<i class="large material-icons">mode_edit</i>
-					</a>
-					<ul>
-						<li><a href="" class="btn-floating red"><i class="material-icons">edit</i></a>editar animal</li>
-						<li><a href="" class="btn-floating yellow darken-1"><i class="material-icons">publish</i></a>atualizar peso</li>
-						<li><a href="" class="btn-floating green"><i class="material-icons">insert_chart</i></a>visualizar relatórios</li>
-					</ul>
-				</div>
+		<div class="col s12 m4 l3"> <!-- Note that "m4 l3" was added -->
+			{{#animal}}
+			<div class="fixed-action-btn">
+				<a class="btn-floating btn-large teal darken-4">
+					<i class="large material-icons">mode_edit</i>
+				</a>
+				<ul>
+					<li><a href="" class="btn-floating red"><i class="material-icons">edit</i></a>editar animal</li>
+					<li><a href="/weight/{{ID}}" class="btn-floating yellow darken-1"><i class="material-icons">publish</i></a>atualizar peso</li>
+					<li><a href="" class="btn-floating green"><i class="material-icons">insert_chart</i></a>visualizar relatórios</li>
+				</ul>
+			</div>
+			{{/animal}}
 
 
-				<div class="row">
-					<div class="card-panel">
-						<div class="center-align">
-							<img src="/pic/{{animal.MainPic.ID}}" alt="Avatar" style="width:200px">
-						</div>
-						<div class="center-align">
-							<span>{{animal.Name}}</span>  
-
-						</div>
+			<div class="row">
+				<div class="card-panel">
+					<div class="center-align">
+						<img src="/pic/{{animal.MainPic.ID}}" alt="Avatar" style="width:200px">
 					</div>
+					<div class="center-align">
+						<span>{{animal.Name}}</span>  
 
-					<div class="card-panel">
-						<div>
-							<span>Nascimento: {{animal.BirthFmt}}</span><br>
-							<span>Peso: {{animal.WeightFmt}}kg</span><br>
-							<span>Tipo: {{animal.Type.Type}}</span><br>
-							<span>Raça: {{animal.Breed.Breed}}</span><br>
-							<span>Propósito: {{animal.PurposesFmt}}</span><br>
-						</div>
 					</div>
+				</div>
 
-					<div class="card-panel">
-						<div class="center-align">
-							<h5>Genealogia:</h5>
-						</div>
-						<div class="row">
+				<div class="card-panel">
+					<div>
+						<span>Nascimento: {{animal.BirthFmt}}</span><br>
+						<span>Peso: {{animal.WeightFmt}}kg</span><br>
+						<span>Tipo: {{animal.Type.Type}}</span><br>
+						<span>Raça: {{animal.Breed.Breed}}</span><br>
+						<span>Propósito: {{animal.PurposesFmt}}</span><br>
+					</div>
+				</div>
 
-							<div class="col s6">
-								<a href="/profile/{{animal.Father.ID}}" ><p>Pai: {{animal.Father.Name}}</p>
+				<div class="card-panel">
+					<div class="center-align">
+						<h5>Genealogia:</h5>
+					</div>
+					<div class="row">
+
+						<div class="col s6">
+							<a href="/profile/{{animal.Father.ID}}" ><p>Pai: {{animal.Father.Name}}</p>
 								<img src="/pic/{{animal.Father.MainPic.ID}}" style="width:100px"></a>
 							</div>
 							<div class="col s6">
 								<a href="/profile/{{animal.Mother.ID}}" > <p>Mãe: {{animal.Mother.Name}}</p>
-								<img src="/pic/{{animal.Mother.MainPic.ID}}" style="width:100px"></a>
+									<img src="/pic/{{animal.Mother.MainPic.ID}}" style="width:100px"></a>
+								</div>
 							</div>
 						</div>
+
+						<div class="card-panel">
+							<div class="center-align">
+								<h5>Fotos:</h5>
+							</div>
+							<div class="row">
+								<img src="/pic/{{animal.MainPic.ID}}" style="width:250px">
+							</div>
+						</div>
+
 					</div>
 
-					<div class="card-panel">
-						<div class="center-align">
-							<h5>Fotos:</h5>
-						</div>
-						<div class="row">
-							<img src="/pic/{{animal.MainPic.ID}}" style="width:250px">
-						</div>
-					</div>
+
+				</div>
+
+				<div class="col s12 m8 l9"> <!-- Note that "m8 l9" was added -->
 
 				</div>
 
 
-			</div>
+				<script type="text/javascript"
+				src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+				<script
+				src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 
-			<div class="col s12 m8 l9"> <!-- Note that "m8 l9" was added -->
-
-			</div>
-
-
-			<script type="text/javascript"
-	   src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-			<script
-    src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
-
-			<script type="text/javascript">
-				$(document).ready(function() {
-					$(".button-collapse").sideNav();
-				})
-			</script>
-	</body>
+				<script type="text/javascript">
+					$(document).ready(function() {
+						$(".button-collapse").sideNav();
+					})
+				</script>
+			</body>
 
 
-</html>
+			</html>

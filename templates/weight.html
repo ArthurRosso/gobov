@@ -1,105 +1,86 @@
-
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>Sisboi - Atualizar Peso</title>
+<head>
 
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>GoBov - Peso Animal</title>
 
-		<!--Import Google Icon Font-->
-		<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-	rel="stylesheet" />
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 
-		<!--Import materialize.css-->
-		<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css" />
 
+</head>
 
-	</head>
-	<body>
+<body>
 
-		<header>
+	<header>
 
-			<nav class="teal darken-4">
-				<div class="nav-wrapper">
-					<a href="index.html" class="brand-logo">Sisboi</a> <a href="index.html"
-							   data-activates="mobile-demo" class="button-collapse"><i
-				       class="material-icons">menu</i></a>
-					<ul class="right hide-on-med-and-down">
-						<li><a href="animal.html">Animal</a></li>
-						<li><a href="medicine.html">Medicine</a></li>
-						<li><a href="medication.html">Medication</a></li>
-						<li><a href="login.html">Sair</a></li>
-					</ul>
-					<ul class="side-nav" id="mobile-demo">
-						<li><a href="animal.html">Animal</a></li>
-						<li><a href="medicine.html">Medicine</a></li>
-						<li><a href="medication.html">Medication</a></li>
-						<li><a href="login.html">Logout</a></li>
-					</ul>
-				</div>
-			</nav>
-
-		</header>
-
-		<div class="container">
-			<div class="card-panel">
-				<form method="post">
-					Peso: <input type="text" name="peso" /> 
-					Descrição: <input type="text" name="descricao" /> 
-					Data: <input type="date" name="data" />
-					<div class="right-align">
-						<button class="btn waves-effect waves-light teal darken-3"
-							type="submit" name="action">
-							Salvar <i class="material-icons right">save</i>
-						</button>
-					</div>
-				</form>
+		<nav class="teal darken-4">
+			<div class="nav-wrapper">
+				<a href="/" class="brand-logo">GoBov</a> <a href="/"
+				data-activates="mobile-demo" class="button-collapse"><i
+				class="material-icons">menu</i></a>
+				<ul class="right hide-on-med-and-down">
+					<li><a href="/animal">Animal</a></li>
+					<li><a href="/medicine">Remédio</a></li>
+					<li><a href="/medication">Medicação</a></li>
+					<li><a href="/login">Sair</a></li>
+				</ul>
+				<ul class="side-nav" id="mobile-demo">
+					<li><a href="/animal">Animal</a></li>
+					<li><a href="/medicine">Remédio</a></li>
+					<li><a href="/Medication">Medicação</a></li>
+					<li><a href="/login">Sair</a></li>
+				</ul>
 			</div>
+		</nav>
 
-			<table>
-				<thead>
-					<tr>
-						<th>Peso</th>
-						<th>Descrição</th>
-						<th>Data</th>
-					</tr>
-				</thead>
+	</header>
 
-				<tbody>
-					<tr>
-						<td>800kg</td>
-						<td>Pesagem do Mês de Abril</td>
-						<td>05/04/2018</td>
-						<td><a class="waves-effect waves-light btn-small"> <i class="material-icons left">delete</i></a></td>
-					</tr>
-					<tr>
-						<td>799kg</td>
-						<td>Pesagem do Mês de Maio</td>
-						<td>05/05/2018</td>
-						<td><a class="waves-effect waves-light btn-small"> <i class="material-icons left">delete</i></a></td>
-					</tr>
-					<tr>
-						<td>801kg</td>
-						<td>Pesagem do Mês de Junho</td>
-						<td>05/06/2018</td>
-						<td><a class="waves-effect waves-light btn-small"> <i class="material-icons left">delete</i></a></td>
-					</tr>
-				</tbody>
-			</table>
+	<div class="container">
+		<div class="card-panel">
+			<form method="post">
+				Peso: <input type="text" name="peso" /> 
+				Descrição: <input type="text" name="descricao" /> 
+				Data: <input type="date" name="data" />
+				<div class="right-align">
+					<button class="btn waves-effect waves-light teal darken-3"
+					type="submit" name="action">
+					Salvar <i class="material-icons right">save</i>
+				</button>
+			</div>
+		</form>
+	</div>
 
-		</div>
+	<table>
+		<thead>
+			<tr>
+				<th>Peso</th>
+				<th>Descrição</th>
+				<th>Data</th>
+			</tr>
+		</thead>
 
-		<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+		<tbody>
+			{{#weights}}
+			<tr>
+				<td>{{Weight}}kg</td>
+				<td>{{Description}}</td>
+				<td>{{DateFmt}}</td>
+				<td><a class="waves-effect waves-light btn-small"> <i class="material-icons left">delete</i></a></td>
+			</tr>
+			{{/weights}}
+		</tbody>
+	</table>
 
+</div>
 
-		<script type="text/javascript">
-		</script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 
-	</body>
+</body>
 
 
 </html>

@@ -2,18 +2,14 @@
 <html>
 <head>
 
-	<title>GoBov - Medicine</title>
+	<title>GoBov - Remédio</title>
 
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-	<!--Import Google Icon Font-->
-	<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-	rel="stylesheet" />
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 
-	<!--Import materialize.css-->
-	<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css" />
 
 </head>
 
@@ -48,24 +44,24 @@
 			<div class="card-panel">
 				<form method="post" action="/newMedicine" enctype="multipart/form-data" >
 					<div class="row">
-						<div class="input-field col s3">
+						<div class="input-field col s6">
 							Nome: <input type="text" name="Name" />
 						</div>
-						<div class="input-field col s3">
+						<div class="input-field col s6">
 							Validade: <input type="date" name="Expiration" />
 						</div>
-						<div class="input-field col s3">
+						<div class="input-field col s6">
 							Descrição: <input type="text" name="Description" />
 						</div>
-						<div class="input-field col s3">
+						<div class="input-field col s6">
 							Tipo: 
 							<select name="Type">
-							{{ #types }}
+								{{ #types }}
 								<option value="{{ID}}">{{Type}}</option>
-							{{ /types }}
+								{{ /types }}
 							</select>
 						</div>
-						<div class="input-field col s6">
+						<div class="input-field col s12">
 							<div class="file-field input-field">
 								<div class="btn teal darken-3">
 									<span>Fotos</span>
@@ -88,42 +84,42 @@
 	</div>
 	<div class="row container">
 		{{ #medicines }}
-				<div class="col s12 m6 l3">
-					<div class="card sticky-action" style="overflow: visible;">
-						<div class="card-image waves-effect waves-block waves-light">
-							<img class="activator" src="/picMedicine/{{ID}}" style="width:100px">
-						</div>
-						<div class="card-content">
-							<span class="card-title activator grey-text text-darken-4">{{Name}}<i class="material-icons right">more_vert</i></span>
-						</div>
-
-						<div class="card-action">
-							<a href="/delMedicine/{{ID}}"><i class="material-icons left">delete</i></a></a>
-							<a href="medicineEditar - Ourovac® Aftosa.html"><i class="material-icons left">edit</i></a></a>
-						</div>
-
-						<div class="card-reveal" style="display: none; transform: translateY(0px);">
-							<span class="card-title grey-text text-darken-4">{{Name}}<i class="material-icons right">close</i></span>
-							<span>Descrição: {{Description}}</span><br>
-							<span>Validade: {{ExpirationFmt}}</span><br>
-							<span>Tipo: {{Type.Type}}</span><br>
-						</div>
-					</div>
+		<div class="col s12 m6 l3">
+			<div class="card sticky-action" style="overflow: visible;">
+				<div class="card-image waves-effect waves-block waves-light">
+					<img class="activator" src="/picMedicine/{{ID}}" style="width:100px">
 				</div>
-			{{ /medicines }}
-		</div>
-	</div>
+				<div class="card-content">
+					<span class="card-title activator grey-text text-darken-4">{{Name}}<i class="material-icons right">more_vert</i></span>
+				</div>
 
-	<script type="text/javascript"
-	src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-	<script
-	src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
-	<script type="text/javascript">
-		$(document).ready(function() {
-			$(".button-collapse").sideNav();
-			$('select').material_select();
-		})
-	</script>
+				<div class="card-action">
+					<a href="/delMedicine/{{ID}}"><i class="material-icons left">delete</i></a></a>
+					<a href="#"><i class="material-icons left">edit</i></a></a>
+				</div>
+
+				<div class="card-reveal" style="display: none; transform: translateY(0px);">
+					<span class="card-title grey-text text-darken-4">{{Name}}<i class="material-icons right">close</i></span>
+					<span>Descrição: {{Description}}</span><br>
+					<span>Validade: {{ExpirationFmt}}</span><br>
+					<span>Tipo: {{Type.Type}}</span><br>
+				</div>
+			</div>
+		</div>
+		{{ /medicines }}
+	</div>
+</div>
+
+<script type="text/javascript"
+src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script
+src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$(".button-collapse").sideNav();
+		$('select').material_select();
+	})
+</script>
 
 </body>
 

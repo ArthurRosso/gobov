@@ -1,170 +1,166 @@
 <!DOCTYPE html>
 <html>
-	<head>
+<head>
 
-		<title>GoBov - Animal</title>
+	<title>GoBov - Animal</title>
 
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-		<!--Import Google Icon Font-->
-		<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-	rel="stylesheet" />
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 
-		<!--Import materialize.css-->
-		<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css" />
 
-	</head>
+</head>
 
-	<body>
+<body>
 
-		<header>
+	<header>
 
-			<nav class="teal darken-4">
-				<div class="nav-wrapper">
-					<a href="/" class="brand-logo">GoBov</a> <a href="/"
-							   data-activates="mobile-demo" class="button-collapse"><i
-				       class="material-icons">menu</i></a>
-					<ul class="right hide-on-med-and-down">
-						<li><a href="/animal">Animal</a></li>
-						<li><a href="/medicine">Remédio</a></li>
-						<li><a href="/medication">Medicação</a></li>
-						<li><a href="/login">Sair</a></li>
-					</ul>
-					<ul class="side-nav" id="mobile-demo">
-						<li><a href="/animal">Animal</a></li>
-						<li><a href="/medicine">Remédio</a></li>
-						<li><a href="/Medication">Medicação</a></li>
-						<li><a href="/login">Sair</a></li>
-					</ul>
-				</div>
-			</nav>
+		<nav class="teal darken-4">
+			<div class="nav-wrapper">
+				<a href="/" class="brand-logo">GoBov</a> <a href="/"
+				data-activates="mobile-demo" class="button-collapse"><i
+				class="material-icons">menu</i></a>
+				<ul class="right hide-on-med-and-down">
+					<li><a href="/animal">Animal</a></li>
+					<li><a href="/medicine">Remédio</a></li>
+					<li><a href="/medication">Medicação</a></li>
+					<li><a href="/login">Sair</a></li>
+				</ul>
+				<ul class="side-nav" id="mobile-demo">
+					<li><a href="/animal">Animal</a></li>
+					<li><a href="/medicine">Remédio</a></li>
+					<li><a href="/Medication">Medicação</a></li>
+					<li><a href="/login">Sair</a></li>
+				</ul>
+			</div>
+		</nav>
 
-		</header>
+	</header>
 
-		<div class="row">
-			<div class="container">
-				<div class="card-panel">
-					<form method="post" action="/newAnimal" enctype="multipart/form-data" >
-						<div class="row">
-							<div class="input-field col s3">
-								Nome: <input type="text" name="Name" />
-							</div>
-							<div class="input-field col s3">
-								DataNasc: <input type="date" name="Birthday" />
-							</div>
-							<div class="input-field col s3">
-								Peso: <input type="text" name="Weight" />
-							</div>
-							<div class="input-field col s3">
-								Tipo: 
-								<select name="Type">
-									{{ #types }}
-									<option value="{{ID}}">{{Type}}</option>
-									{{ /types }}
-								</select>
-							</div>
-							<div class="input-field col s3">
-								Raça: 
-								<select name="Breed">
-									{{ #breeds }}
-									<option value="{{ID}}">{{Breed}}</option>
-									{{ /breeds }}
-								</select>
-							</div>
-							<div class="input-field col s3">
-								Finalidade: 
-								<select multiple name="Purpose">
-									{{ #purposes }}
-									<option value="{{ID}}">{{Purpose}}</option>
-									{{ /purposes }}
-								</select>
-							</div>
-							<div class="input-field col s3">
-								Mãe: 
-								<select name="Mother">
-									<option value="0">Sem mãe</option>
-									{{ #mothers }}
-									<option value="{{ID}}">{{Name}}</option>
-									{{ /mothers }}
-								</select>
-							</div>
-							<div class="input-field col s3">
-								Pai: 
-								<select name="Father">
-									<option value="0">Sem pai</option>
-									{{ #fathers }}
-									<option value="{{ID}}">{{Name}}</option>
-									{{ /fathers }}
-								</select>
-							</div>
+	<div class="row">
+		<div class="container">
+			<div class="card-panel">
+				<form method="post" action="/newAnimal" enctype="multipart/form-data" >
+					<div class="row">
+						<div class="input-field col s6">
+							Nome: <input type="text" name="Name" />
+						</div>
+						<div class="input-field col s6">
+							DataNasc: <input type="date" name="Birthday" />
+						</div>
+						<div class="input-field col s6">
+							Peso: <input type="text" name="Weight" />
+						</div>
+						<div class="input-field col s6">
+							Tipo: 
+							<select name="Type">
+								{{ #types }}
+								<option value="{{ID}}">{{Type}}</option>
+								{{ /types }}
+							</select>
+						</div>
+						<div class="input-field col s6">
+							Raça: 
+							<select name="Breed">
+								{{ #breeds }}
+								<option value="{{ID}}">{{Breed}}</option>
+								{{ /breeds }}
+							</select>
+						</div>
+						<div class="input-field col s6">
+							Finalidade: 
+							<select multiple name="Purpose">
+								{{ #purposes }}
+								<option value="{{ID}}">{{Purpose}}</option>
+								{{ /purposes }}
+							</select>
+						</div>
+						<div class="input-field col s6">
+							Mãe: 
+							<select name="Mother">
+								<option value="0">Sem mãe</option>
+								{{ #mothers }}
+								<option value="{{ID}}">{{Name}}</option>
+								{{ /mothers }}
+							</select>
+						</div>
+						<div class="input-field col s6">
+							Pai: 
+							<select name="Father">
+								<option value="0">Sem pai</option>
+								{{ #fathers }}
+								<option value="{{ID}}">{{Name}}</option>
+								{{ /fathers }}
+							</select>
+						</div>
 
-							<div class="input-field col s6">
-								<div class="file-field input-field">
-									<div class="btn teal darken-3">
-										<span>Fotos</span>
-										<input name="Pictures" type="file" multiple>
-									</div>
-									<div class="file-path-wrapper">
-										<input class="file-path validate" name="Pictures" type="text" placeholder="Uma ou mais fotos.">
-									</div>
+						<div class="input-field col s12">
+							<div class="file-field input-field">
+								<div class="btn teal darken-3">
+									<span>Fotos</span>
+									<input name="Pictures" type="file" multiple>
+								</div>
+								<div class="file-path-wrapper">
+									<input class="file-path validate" name="Pictures" type="text" placeholder="Uma ou mais fotos.">
 								</div>
 							</div>
 						</div>
-						<div class="right-align">
-							<button class="btn waves-effect waves-light teal darken-3"
-	       type="submit" name="action">
-								Salvar <i class="material-icons right">save</i>
-							</button>
-						</div>
-					</form>
-				</div>
-			</div>
-
-			<div class="row container">
-				{{#animals}}
-				<div class="col s12 m6 l3">
-					<div class="card sticky-action" style="overflow: visible;">
-						<div class="card-image waves-effect waves-block waves-light">
-							<img class="activator" src="/pic/{{MainPic.ID}}" style="width:100px"/> 
-						</div>
-						<div class="card-content">
-							<span class="card-title activator grey-text text-darken-4">{{Name}}<i class="material-icons right">more_vert</i></span>
-
-							<p><a href="profile/{{ID}}">Mostrar {{Name}}</a></p>
-						</div>
-
-						<div class="card-action">
-							<a href="/delAnimal/{{ID}}"><i class="material-icons left">delete</i></a></a>
-						</div>
-
-						<div class="card-reveal" style="display: none; transform: translateY(0px);">
-							<span class="card-title grey-text text-darken-4">{{Name}}<i class="material-icons right">close</i></span>
-							<span>Nascimento: {{BirthFmt}} </span><br>
-							<span>Peso: {{WeightFmt}}kg</span><br>
-							<span>Tipo: {{Type.Type}}</span><br>
-							<span>Raça: {{Breed.Breed}}</span><br>
-							<span>Propósito: {{PurposesFmt}}</span><br>
-						</div>
 					</div>
-					
+					<div class="right-align">
+						<button class="btn waves-effect waves-light teal darken-3"
+						type="submit" name="action">
+						Salvar <i class="material-icons right">save</i>
+					</button>
 				</div>
-				{{/animals}}
+			</form>
+		</div>
+	</div>
+
+	<div class="row container">
+		{{#animals}}
+		<div class="col s12 m6 l3">
+			<div class="card sticky-action" style="overflow: visible;">
+				<div class="card-image waves-effect waves-block waves-light">
+					<img class="activator" src="/pic/{{MainPic.ID}}" style="width:100px"/> 
+				</div>
+				<div class="card-content">
+					<span class="card-title activator grey-text text-darken-4">{{Name}}<i class="material-icons right">more_vert</i></span>
+
+					<p><a href="profile/{{ID}}">Mostrar {{Name}}</a></p>
+				</div>
+
+				<div class="card-action">
+					<a href="/delAnimal/{{ID}}"><i class="material-icons left">delete</i></a></a>
+				</div>
+
+				<div class="card-reveal" style="display: none; transform: translateY(0px);">
+					<span class="card-title grey-text text-darken-4">{{Name}}<i class="material-icons right">close</i></span>
+					<span>Nascimento: {{BirthFmt}} </span><br>
+					<span>Peso: {{WeightFmt}}kg</span><br>
+					<span>Tipo: {{Type.Type}}</span><br>
+					<span>Raça: {{Breed.Breed}}</span><br>
+					<span>Propósito: {{PurposesFmt}}</span><br>
+				</div>
 			</div>
+			
+		</div>
+		{{/animals}}
+	</div>
 
-			<script type="text/javascript"
-	   src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-			<script
-    src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
-			<script type="text/javascript">
-				$(document).ready(function() {
-					$(".button-collapse").sideNav();
-					$('select').material_select();
-				})
-			</script>
+	<script type="text/javascript"
+	src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$(".button-collapse").sideNav();
+			$('select').material_select();
+		})
+	</script>
 
-	</body>
+</body>
 
 
 </html>

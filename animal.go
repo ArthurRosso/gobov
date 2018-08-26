@@ -14,8 +14,8 @@ type Animal struct {
 	Type        *TypeAnimal
 	Breed       *Breed
 	Purposes    []Purpose `gorm:"many2many:animal_purpose"`
-	Pictures    []Picture // R
-	Medications []Medication `gorm:"many2many:medication_animal"` // R
+	Pictures    []Picture
+	Medications []Medication `gorm:"many2many:medication_animal"`
 	Mother      *Animal
 	Father      *Animal
 
