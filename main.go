@@ -5,6 +5,7 @@ import (
 "github.com/cbroglie/mustache"
 "github.com/go-sql-driver/mysql"
 "github.com/gorilla/mux"
+"github.com/gorilla/sessions"
 "github.com/jinzhu/gorm"
 "io/ioutil"
 "net/http"
@@ -14,12 +15,15 @@ import (
 
 var (
 	db *gorm.DB
+	key = []byte("super-secret-key")
+	store = sessions.NewCookieStore(key)
 )
 
 func main() {
 	db, _ = gorm.Open("mysql", "goboi:goboi@/goboi")
 
 	db.AutoMigrate(&Animal{})
+	db.AutoMigrate(&User{})
 	db.AutoMigrate(&Weight{})
 	db.AutoMigrate(&TypeAnimal{})
 	db.AutoMigrate(&Breed{})
@@ -34,7 +38,7 @@ func main() {
 
 	r := mux.NewRouter()
 
-	r.HandleFunc("/}", getIndex)
+	r.HandleFunc("/", getIndex)
 
 	r.HandleFunc("/pic/{idAnimal}", getPic)
 	r.HandleFunc("/picMedicine/{idMedicine}", getMedicinePic)
@@ -43,6 +47,7 @@ func main() {
 	r.HandleFunc("/newAnimal", postAnimal)
 	r.HandleFunc("/delAnimal/{ID}", delAnimal)
 	//r.HandleFunc("/editAnimal/{ID}", editAnimal)
+	//r.HandleFunc("/relatorioAnimal/{ID}", relAnimal)
 	
 	
 	r.HandleFunc("/weight/{idAnimal}", getWeight)
@@ -57,6 +62,13 @@ func main() {
 
 	r.HandleFunc("/medication", getMedication)
 	r.HandleFunc("/newMedication", postMedication)
+
+	r.HandleFunc("/register", register)
+	r.HandleFunc("/checkRegister", checkRegister)
+	r.HandleFunc("/secret", secret)
+	r.HandleFunc("/auth", auth)
+	r.HandleFunc("/login", login)
+	r.HandleFunc("/logout", logout)
 	
 	fmt.Println("Server listen and serve on port 8000")
 
@@ -70,6 +82,90 @@ func getIndex (w http.ResponseWriter, r *http.Request) {
 	bit := []byte(str)
 	w.Write(bit)
 }
+
+func register (w http.ResponseWriter, r *http.Request) {
+	context := map[string]interface{}{}
+
+	str, _ := mustache.RenderFile("templates/register.html", context)
+	bit := []byte(str)
+	w.Write(bit)
+}
+
+func checkRegister(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "cookie-name")
+
+	// Authentication goes here
+	user := User{}
+	username := r.PostFormValue("Username")
+	password := r.PostFormValue("Password")
+	db.Where("username = ? AND password = ?", username, password).First(&user, User{})
+
+	if user.Username != "" {
+		http.Redirect(w, r, "/register", http.StatusMovedPermanently)
+	} else {
+		user.Username = username
+		user.Password = password
+		user.Name = r.PostFormValue("Name")
+		user.Email = r.PostFormValue("Email")
+		db.Save(&user)
+
+		// Set user as authenticated
+		session.Values["authenticated"] = true
+		session.Save(r, w)
+
+		http.Redirect(w, r, "/", http.StatusMovedPermanently)
+	}
+}
+
+func login (w http.ResponseWriter, r *http.Request) {
+	context := map[string]interface{}{}
+
+	str, _ := mustache.RenderFile("templates/login.html", context)
+	bit := []byte(str)
+	w.Write(bit)
+}
+
+func secret(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "cookie-name")
+
+	// Check if user is authenticated
+	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	// Print secret message
+	//fmt.Fprintln(w, "The cake is a lie!")
+}
+
+
+func auth(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "cookie-name")
+
+	// Authentication goes here
+	user := User{}
+	username := r.PostFormValue("Username")
+	password := r.PostFormValue("Password")
+	db.Where("username = ?", username).Where("password = ?", password).First(&user, User{})
+
+	if user.Username == "" {
+		http.Redirect(w, r, "/login", http.StatusMovedPermanently)
+	} else {
+		// Set user as authenticated
+		session.Values["authenticated"] = true
+		session.Save(r, w)
+		http.Redirect(w, r, "/", http.StatusMovedPermanently)
+	}
+}
+
+func logout(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "cookie-name")
+
+	// Revoke users authentication
+	session.Values["authenticated"] = false
+	session.Save(r, w)
+}
+
 
 func getWeight(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -88,7 +184,6 @@ func getWeight(w http.ResponseWriter, r *http.Request) {
 	bit := []byte(str)
 	w.Write(bit)
 }
-
 
 func postWeight(w http.ResponseWriter, r *http.Request) {
 	weight := Weight{}
@@ -125,7 +220,6 @@ func delWeight(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, url, http.StatusMovedPermanently)
 }
-
 
 func getPic(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -199,6 +293,7 @@ func getAnimal(w http.ResponseWriter, r *http.Request) {
 		bit := []byte(str)
 		w.Write(bit)
 	}
+
 
 	func postAnimal(w http.ResponseWriter, r *http.Request) {
 		animal := NewAnimal()
@@ -374,7 +469,7 @@ func getAnimal(w http.ResponseWriter, r *http.Request) {
 		w.Write(bit)
 	}
 
-	func postMedication(w http.ResponseWriter, r *http.Request) {	
+	func postMedication(w http.ResponseWriter, r *http.Request) {
 		medication := Medication{}
 		medication.Description = r.PostFormValue("Description")
 

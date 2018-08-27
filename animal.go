@@ -18,11 +18,13 @@ type Animal struct {
 	Medications []Medication `gorm:"many2many:medication_animal"`
 	Mother      *Animal
 	Father      *Animal
+	User        *User
 
-	MotherID int
-	FatherID int
-	TypeID   int
-	BreedID  int
+	UserID		int
+	MotherID	int
+	FatherID	int
+	TypeID  	int
+	BreedID 	int
 }
 
 func NewAnimal() Animal {

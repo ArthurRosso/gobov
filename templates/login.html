@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<title>GoBov - Login</title>
+
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css" />
+
+</head>
+
+<body>
+	<center>
+		<div class="container">
+			<div class="row">
+				<h5 id="title">Entrar</h5>
+				<form method="post" class="form-signin" action="/auth">
+
+					<div class="input-field" id="username">
+						<input type="text" id="username" name="Username" /><label for="username">Username</label>
+					</div>
+					<div class="input-field" id="password">
+						<input type="password" id="password" name="Password" /><label for="password">Password</label>
+					</div>
+					<center><p>
+						Novo por aqui? <a href="/register">Registre-se</a> hoje!
+					</p></center>
+					<div class="col s12"><br>
+						<button class="btn waves-effect waves-light teal darken-3"
+						type="submit" name="action">
+						Enviar <i class="material-icons right">send</i>
+					</button>
+
+				</div>
+			</form><br><br>
+			<center><div id="err"></div></center>
+		</div>
+
+	</div>
+</center>
+</body>
+</html>

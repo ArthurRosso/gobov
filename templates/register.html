@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<title>GoBov - Login</title>
+
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css" />
+
+</head>
+
+<body>
+	<center>
+		<div class="container">
+			<div class="row">
+				<h5 id="title">Registrar</h5>
+				<form method="post" class="form-signin" action="/checkRegister">
+
+					<div class="input-field">
+						<input type="text" id="username" name="Username" /><label for="username">Username</label>
+					</div>
+					<div class="input-field">
+						<input type="password" id="password" name="Password" /><label for="password">Password</label>
+					</div>
+					<div class="input-field">
+						<input type="text" id="name" name="Name" /><label for="name">Name</label>
+					</div>
+					<div class="input-field">
+						<input type="text" id="email" name="Email" /><label for="email">Email</label>
+					</div>
+					<center><p>
+						Já possui um cadastro? <a href="/login"">Entre</a> agora!
+					</p></center>
+					<div class="col s12"><br>
+						<button class="btn waves-effect waves-light teal darken-3"
+						type="submit" name="action">
+						Enviar <i class="material-icons right">send</i>
+					</button>
+
+				</div>
+			</form>
+		</div>
+
+	</div>
+</center>
+
+</body>
+</html>
