@@ -17,6 +17,9 @@ var (
 	db *gorm.DB
 	key = []byte("super-secret-key")
 	store = sessions.NewCookieStore(key)
+	countAnimals int
+	countMedicines int
+	countMedications int
 )
 
 func main() {
@@ -76,7 +79,15 @@ func main() {
 }
 
 func getIndex (w http.ResponseWriter, r *http.Request) {
-	context := map[string]interface{}{}
+	db.Table("animals").Count(&countAnimals)
+	db.Table("medicines").Count(&countMedicines)
+	db.Table("medications").Count(&countMedications)
+
+	context := map[string]interface{}{
+		"counta": countAnimals,
+		"countm": countMedicines,
+		"countmed": countMedications,
+	}
 
 	str, _ := mustache.RenderFile("templates/index.html", context)
 	bit := []byte(str)
