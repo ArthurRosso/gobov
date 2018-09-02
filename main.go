@@ -50,7 +50,7 @@ func main() {
 	r.HandleFunc("/newAnimal", postAnimal)
 	r.HandleFunc("/delAnimal/{ID}", delAnimal)
 	//r.HandleFunc("/editAnimal/{ID}", editAnimal)
-	//r.HandleFunc("/relatorioAnimal/{ID}", relAnimal)
+	r.HandleFunc("/relatorioAnimal/{idAnimal}", relAnimal)
 	
 	
 	r.HandleFunc("/weight/{idAnimal}", getWeight)
@@ -78,7 +78,7 @@ func main() {
 	http.ListenAndServe(":8000", r)
 }
 
-func getIndex (w http.ResponseWriter, r *http.Request) {
+func getIndex(w http.ResponseWriter, r *http.Request) {
 	db.Table("animals").Count(&countAnimals)
 	db.Table("medicines").Count(&countMedicines)
 	db.Table("medications").Count(&countMedications)
@@ -94,7 +94,7 @@ func getIndex (w http.ResponseWriter, r *http.Request) {
 	w.Write(bit)
 }
 
-func register (w http.ResponseWriter, r *http.Request) {
+func register(w http.ResponseWriter, r *http.Request) {
 	context := map[string]interface{}{}
 
 	str, _ := mustache.RenderFile("templates/register.html", context)
@@ -128,7 +128,7 @@ func checkRegister(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func login (w http.ResponseWriter, r *http.Request) {
+func login(w http.ResponseWriter, r *http.Request) {
 	context := map[string]interface{}{}
 
 	str, _ := mustache.RenderFile("templates/login.html", context)
@@ -175,6 +175,25 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	// Revoke users authentication
 	session.Values["authenticated"] = false
 	session.Save(r, w)
+}
+
+func relAnimal(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	idAnimal, _ := strconv.Atoi(vars["idAnimal"])
+	animal := Animal{}
+	db.First(&animal, idAnimal)
+
+	weights := []Weight{}
+	db.Where("animal_id = ?", idAnimal).Find(&weights)
+
+	context := map[string]interface{}{
+		"weights": weights,
+		"animal": animal,
+	}
+
+	str, _ := mustache.RenderFile("templates/charts.html", context)
+	bit := []byte(str)
+	w.Write(bit)
 }
 
 

@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/go-sql-driver/mysql"
-	_ "github.com/jinzhu/gorm"
+	"time"
 )
 
 type Weight struct {
@@ -17,4 +17,12 @@ type Weight struct {
 
 func (w Weight) DateFmt() string {
 	return w.Date.Time.Format("02/01/2006")
+}
+
+func (w Weight) Months() time.Month {
+	return w.Date.Time.Month()
+}
+
+func (w Weight) Years() int {
+	return w.Date.Time.Year()
 }
