@@ -15,8 +15,7 @@ import (
 
 var (
 	db *gorm.DB
-	key = []byte("super-secret-key")
-	store = sessions.NewCookieStore(key)
+	store = sessions.NewCookieStore([]byte("super-secret-key"))
 	countAnimals int
 	countMedicines int
 	countMedications int
@@ -68,7 +67,6 @@ func main() {
 
 	r.HandleFunc("/register", register)
 	r.HandleFunc("/checkRegister", checkRegister)
-	r.HandleFunc("/secret", secret)
 	r.HandleFunc("/auth", auth)
 	r.HandleFunc("/login", login)
 	r.HandleFunc("/logout", logout)
@@ -79,11 +77,21 @@ func main() {
 }
 
 func getIndex(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "id")
+
+	if session.Values["id"] == nil || session.Values["id"] == 0 {
+		http.Redirect(w, r, "/login", http.StatusMovedPermanently)
+	}
+
+	user := User{}
+	db.First(&user, session.Values["id"])
+
 	db.Table("animals").Count(&countAnimals)
 	db.Table("medicines").Count(&countMedicines)
 	db.Table("medications").Count(&countMedications)
 
 	context := map[string]interface{}{
+		"user": user,
 		"counta": countAnimals,
 		"countm": countMedicines,
 		"countmed": countMedications,
@@ -103,7 +111,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 }
 
 func checkRegister(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "cookie-name")
+	session, _ := store.Get(r, "id")
 
 	// Authentication goes here
 	user := User{}
@@ -121,7 +129,8 @@ func checkRegister(w http.ResponseWriter, r *http.Request) {
 		db.Save(&user)
 
 		// Set user as authenticated
-		session.Values["authenticated"] = true
+		db.First(&user)
+		session.Values["id"] = user.ID
 		session.Save(r, w)
 
 		http.Redirect(w, r, "/", http.StatusMovedPermanently)
@@ -136,22 +145,8 @@ func login(w http.ResponseWriter, r *http.Request) {
 	w.Write(bit)
 }
 
-func secret(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "cookie-name")
-
-	// Check if user is authenticated
-	if auth, ok := session.Values["authenticated"].(bool); !ok || !auth {
-		http.Error(w, "Forbidden", http.StatusForbidden)
-		return
-	}
-
-	// Print secret message
-	//fmt.Fprintln(w, "The cake is a lie!")
-}
-
-
 func auth(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "cookie-name")
+	session, _ := store.Get(r, "id")
 
 	// Authentication goes here
 	user := User{}
@@ -163,21 +158,30 @@ func auth(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/login", http.StatusMovedPermanently)
 	} else {
 		// Set user as authenticated
-		session.Values["authenticated"] = true
+		db.First(&user)
+		session.Values["id"] = user.ID
 		session.Save(r, w)
 		http.Redirect(w, r, "/", http.StatusMovedPermanently)
 	}
 }
 
 func logout(w http.ResponseWriter, r *http.Request) {
-	session, _ := store.Get(r, "cookie-name")
+	session, _ := store.Get(r, "id")
 
 	// Revoke users authentication
-	session.Values["authenticated"] = false
+	session.Values["id"] = nil
 	session.Save(r, w)
+
+	http.Redirect(w, r, "/login", http.StatusMovedPermanently)
 }
 
 func relAnimal(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "id")
+
+	if session.Values["id"] == nil || session.Values["id"] == 0 {
+		http.Redirect(w, r, "/login", http.StatusMovedPermanently)
+	}
+
 	vars := mux.Vars(r)
 	idAnimal, _ := strconv.Atoi(vars["idAnimal"])
 	animal := Animal{}
@@ -198,6 +202,12 @@ func relAnimal(w http.ResponseWriter, r *http.Request) {
 
 
 func getWeight(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "id")
+
+	if session.Values["id"] == nil || session.Values["id"] == 0 {
+		http.Redirect(w, r, "/login", http.StatusMovedPermanently)
+	}
+
 	vars := mux.Vars(r)
 	idAnimal, _ := strconv.Atoi(vars["idAnimal"])
 	animal := Animal{ID: idAnimal}
@@ -216,6 +226,12 @@ func getWeight(w http.ResponseWriter, r *http.Request) {
 }
 
 func postWeight(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "id")
+
+	if session.Values["id"] == nil || session.Values["id"] == 0 {
+		http.Redirect(w, r, "/login", http.StatusMovedPermanently)
+	}
+
 	weight := Weight{}
 	peso, _ := strconv.ParseFloat(r.PostFormValue("Weight"), 32)
 	weight.Weight = float32(peso)
@@ -239,6 +255,12 @@ func postWeight(w http.ResponseWriter, r *http.Request) {
 }
 
 func delWeight(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "id")
+
+	if session.Values["id"] == nil || session.Values["id"] == 0 {
+		http.Redirect(w, r, "/login", http.StatusMovedPermanently)
+	}
+
 	vars := mux.Vars(r)
 	idWeight, _ := strconv.Atoi(vars["idWeight"])
 	weight := Weight{}
@@ -252,6 +274,12 @@ func delWeight(w http.ResponseWriter, r *http.Request) {
 }
 
 func getPic(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "id")
+
+	if session.Values["id"] == nil || session.Values["id"] == 0 {
+		http.Redirect(w, r, "/login", http.StatusMovedPermanently)
+	}
+
 	vars := mux.Vars(r)
 	idAnimal, _ := strconv.Atoi(vars["idAnimal"])
 	picture := Picture{}
@@ -261,7 +289,29 @@ func getPic(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func getMedicinePic(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "id")
+
+	if session.Values["id"] == nil || session.Values["id"] == 0 {
+		http.Redirect(w, r, "/login", http.StatusMovedPermanently)
+	}
+	
+	vars := mux.Vars(r)
+	medicine := Medicine{}
+	idMedicine, _ := strconv.Atoi(vars["idMedicine"])
+	db.First(&medicine, idMedicine)
+	if len(medicine.Picture) > 0 {
+		w.Write(medicine.Picture)
+	}
+}
+
 func getProfile(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "id")
+
+	if session.Values["id"] == nil || session.Values["id"] == 0 {
+		http.Redirect(w, r, "/login", http.StatusMovedPermanently)
+	}
+
 	vars := mux.Vars(r)
 	idAnimal, _ := strconv.Atoi(vars["idAnimal"])
 	animal := Animal{ID: idAnimal}
@@ -276,17 +326,13 @@ func getProfile(w http.ResponseWriter, r *http.Request) {
 	w.Write(bit)
 }
 
-func getMedicinePic(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	medicine := Medicine{}
-	idMedicine, _ := strconv.Atoi(vars["idMedicine"])
-	db.First(&medicine, idMedicine)
-	if len(medicine.Picture) > 0 {
-		w.Write(medicine.Picture)
-	}
-}
-
 func getAnimal(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "id")
+
+	if session.Values["id"] == nil || session.Values["id"] == 0 {
+		http.Redirect(w, r, "/login", http.StatusMovedPermanently)
+	}
+
 	animals := []Animal{}
 	db.Preload("Weights").Preload("Type").Preload("Breed").Preload("Purposes").Find(&animals, Animal{})
 
@@ -326,6 +372,12 @@ func getAnimal(w http.ResponseWriter, r *http.Request) {
 
 
 	func postAnimal(w http.ResponseWriter, r *http.Request) {
+		session, _ := store.Get(r, "id")
+
+		if session.Values["id"] == nil || session.Values["id"] == 0 {
+			http.Redirect(w, r, "/login", http.StatusMovedPermanently)
+		}
+
 		animal := NewAnimal()
 		animal.Name = r.PostFormValue("Name")
 
@@ -402,6 +454,12 @@ func getAnimal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	func delAnimal(w http.ResponseWriter, r *http.Request) {
+		session, _ := store.Get(r, "id")
+
+		if session.Values["id"] == nil || session.Values["id"] == 0 {
+			http.Redirect(w, r, "/login", http.StatusMovedPermanently)
+		}
+
 		m := mux.Vars(r)
 		id, _ := strconv.Atoi(m["ID"])
 		animal := Animal{ID: id}
@@ -419,6 +477,11 @@ func getAnimal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	func delMedicine(w http.ResponseWriter, r *http.Request) {
+		session, _ := store.Get(r, "id")
+
+		if session.Values["id"] == nil || session.Values["id"] == 0 {
+			http.Redirect(w, r, "/login", http.StatusMovedPermanently)
+		}
 		m := mux.Vars(r)
 		id, _ := strconv.Atoi(m["ID"])
 		medicine := Medicine{ID: id}
@@ -431,6 +494,12 @@ func getAnimal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	func getMedicine(w http.ResponseWriter, r *http.Request) {
+		session, _ := store.Get(r, "id")
+
+		if session.Values["id"] == nil || session.Values["id"] == 0 {
+			http.Redirect(w, r, "/login", http.StatusMovedPermanently)
+		}
+
 		medicines := []Medicine{}
 		db.Preload("Type").Find(&medicines, Medicine{})
 
@@ -448,6 +517,12 @@ func getAnimal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	func postMedicine(w http.ResponseWriter, r *http.Request) {
+		session, _ := store.Get(r, "id")
+
+		if session.Values["id"] == nil || session.Values["id"] == 0 {
+			http.Redirect(w, r, "/login", http.StatusMovedPermanently)
+		}
+
 		medicine := NewMedicine()
 		medicine.Name = r.PostFormValue("Name")
 
@@ -479,6 +554,12 @@ func getAnimal(w http.ResponseWriter, r *http.Request) {
 
 
 	func getMedication(w http.ResponseWriter, r *http.Request) {
+		session, _ := store.Get(r, "id")
+
+		if session.Values["id"] == nil || session.Values["id"] == 0 {
+			http.Redirect(w, r, "/login", http.StatusMovedPermanently)
+		}
+
 		medications := []Medication{}
 		db.Preload("Animals").Preload("Medicines").Find(&medications, Medication{})
 
@@ -500,6 +581,12 @@ func getAnimal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	func postMedication(w http.ResponseWriter, r *http.Request) {
+		session, _ := store.Get(r, "id")
+
+		if session.Values["id"] == nil || session.Values["id"] == 0 {
+			http.Redirect(w, r, "/login", http.StatusMovedPermanently)
+		}
+
 		medication := Medication{}
 		medication.Description = r.PostFormValue("Description")
 
