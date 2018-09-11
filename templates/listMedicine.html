@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<title>GoBov - Lista de Remédios</title>
+
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css" />
+
+</head>
+
+<body>
+
+	<header>
+
+		<nav class="teal darken-4">
+			<div class="nav-wrapper">
+				<a href="/" class="brand-logo">GoBov</a> <a href="/"
+				data-activates="mobile-demo" class="button-collapse"><i
+				class="material-icons">menu</i></a>
+				<ul class="right hide-on-med-and-down">
+					<li><a href="/animal">Animal</a></li>
+					<li><a href="/medicine">Remédio</a></li>
+					<li><a href="/medication">Medicação</a></li>
+					<li><a href="/logout">Sair</a></li>
+				</ul>
+				<ul class="side-nav" id="mobile-demo">
+					<li><a href="/animal">Animal</a></li>
+					<li><a href="/medicine">Remédio</a></li>
+					<li><a href="/medication">Medicação</a></li>
+					<li><a href="/logout">Logout</a></li>
+				</ul>
+			</div>
+		</nav>
+
+	</header>
+
+	<div class="row container">
+		
+		<!-- TODO: Fazer a pesquisa -->
+		<form>
+			<div class="input-field">
+				<i class="material-icons prefix">search</i>
+				<input id="search" type="search" required>
+				<i class="material-icons">close</i>
+			</div>
+		</form>
+
+		{{ #medicines }}
+		<div class="col s12 m6 l3">
+			<div class="card sticky-action" style="overflow: visible;">
+				<div class="card-image waves-effect waves-block waves-light">
+					<img class="activator" src="/picMedicine/{{ID}}" style="width:100px">
+				</div>
+				<div class="card-content">
+					<span class="card-title activator grey-text text-darken-4">{{Name}}<i class="material-icons right">more_vert</i></span>
+				</div>
+
+				<div class="card-action">
+					<a href="/delMedicine/{{ID}}"><i class="material-icons left">delete</i></a></a>
+					<a href="#"><i class="material-icons left">edit</i></a></a>
+				</div>
+
+				<div class="card-reveal" style="display: none; transform: translateY(0px);">
+					<span class="card-title grey-text text-darken-4">{{Name}}<i class="material-icons right">close</i></span>
+					<span>Descrição: {{Description}}</span><br>
+					<span>Validade: {{ExpirationFmt}}</span><br>
+					<span>Tipo: {{Type.Type}}</span><br>
+				</div>
+			</div>
+		</div>
+		{{ /medicines }}
+	</div>
+</div>
+
+<script type="text/javascript"
+src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script
+src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$(".button-collapse").sideNav();
+		$('select').material_select();
+	})
+</script>
+
+</body>
+
+
+</html>

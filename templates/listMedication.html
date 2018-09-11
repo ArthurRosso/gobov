@@ -45,41 +45,40 @@
 
 	</header>
 
-	<div class="container">
-		<div class="card-panel">
-			<form method="post" action="/newMedication" enctype="multipart/form-data" >
-				Descrição: <input type="text" name="Description" /> 
-				Data: <input type="date" name="Date" />
-				<div>
-					Animais:
-					{{ #animals }}
-					<p>
-						<input type="checkbox" id="{{ID}}" name="Animal" value="{{ID}}" />
-						<label for="{{ID}}">{{Name}}</label>
-					</p>
-					{{ /animals }}
+	<div class="col s12 m8 l9"> <!-- Note that "m8 l9" was added -->
+
+		{{ #medications }}
+		<div class="card horizontal">
+			<div class="card-image">
+				<div class="row">
+
+					<div class="col s6">
+						{{ #animals }}
+						<img src="/pic/{{MainPic.ID}}" style="width:100px"/>
+						{{ /animals }} 
+					</div>
+					<div class="col s6">
+						{{ #medicines }}
+						<img src="/picMedicine/{{ID}}" style="width:100px"/>
+						{{ /medicines }} 
+					</div>
+
 				</div>
-				<br>
-				<div>
-					Remédio:
-					{{ #medicines }}
-					<p>
-						<input type="checkbox" id="medicine-{{ID}}" name="Medicine" value="{{ID}}" />
-						<label for="medicine-{{ID}}">{{Name}}</label>
-					</p>
-					{{ /medicines }}
-				</div>
-				<div class="right-align">
-					<button class="btn waves-effect waves-light teal darken-3"
-					type="submit" name="action">
-					Salvar <i class="material-icons right">save</i>
-				</button>
 			</div>
-		</form>
-	</div>
-	<div class="right-align">
-			<a class="waves-effect waves-light btn teal darken-3" href="/listaMedication"><i class="material-icons left">list</i>Lista de medicações</a>
+			<div class="card-stacked">
+				<div class="card-content">
+					<p>Os animals: </p>
+					<ol>{{ #animals }}<li>{{Name}}</li>{{ /animals }}</ol>
+					<p>Foram medicados com:</p>
+					<ol>{{ #medicines }}<li>{{Name}}</li>{{ /medicines }}</ol>
+				</div>
+				<div class="card-action">
+					{{ #animals }}<a href="/profile/{{ID}}">Show {{Name}}</a>{{ /animals }}
+				</div>
+			</div>
 		</div>
+		{{ /medications }}
+	</div>
 
 </div>
 

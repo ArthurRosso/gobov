@@ -10,6 +10,9 @@ type Medication struct {
 	Date        mysql.NullTime
 	Animals     []Animal   `gorm:"many2many:medication_animal"`
 	Medicines   []Medicine `gorm:"many2many:medication_medicine"`
+	User        *User
+
+	UserID		int
 }
 
 func (m Medication) DateFmt() string {

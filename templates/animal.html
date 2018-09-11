@@ -116,37 +116,9 @@
 				</div>
 			</form>
 		</div>
-	</div>
-
-	<div class="row container">
-		{{#animals}}
-		<div class="col s12 m6 l3">
-			<div class="card sticky-action" style="overflow: visible;">
-				<div class="card-image waves-effect waves-block waves-light">
-					<img class="activator" src="/pic/{{MainPic.ID}}" style="width:100px"/> 
-				</div>
-				<div class="card-content">
-					<span class="card-title activator grey-text text-darken-4">{{Name}}<i class="material-icons right">more_vert</i></span>
-
-					<p><a href="profile/{{ID}}">Mostrar {{Name}}</a></p>
-				</div>
-
-				<div class="card-action">
-					<a href="/delAnimal/{{ID}}"><i class="material-icons left">delete</i></a></a>
-				</div>
-
-				<div class="card-reveal" style="display: none; transform: translateY(0px);">
-					<span class="card-title grey-text text-darken-4">{{Name}}<i class="material-icons right">close</i></span>
-					<span>Nascimento: {{BirthFmt}} </span><br>
-					<span>Peso: {{WeightFmt}}kg</span><br>
-					<span>Tipo: {{Type.Type}}</span><br>
-					<span>Raça: {{Breed.Breed}}</span><br>
-					<span>Propósito: {{PurposesFmt}}</span><br>
-				</div>
-			</div>
-			
+		<div class="right-align">
+			<a class="waves-effect waves-light btn teal darken-3" href="/listaAnimal"><i class="material-icons left">list</i>Lista de animais</a>
 		</div>
-		{{/animals}}
 	</div>
 
 	<script type="text/javascript"

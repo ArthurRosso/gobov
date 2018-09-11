@@ -10,4 +10,6 @@ type User struct {
 	Name 		string
 	Password	string
 	Animals    	[]Animal
+	Medicines   []Medicine
+	Medications []Medication
 }
