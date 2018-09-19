@@ -13,7 +13,7 @@
 
 	<style type="text/css">
 	ol {
-		list-style-type: disc; 
+		list-style-type: disc;
 	}
 </style>
 
@@ -53,14 +53,14 @@
 				<div class="row">
 
 					<div class="col s6">
-						{{ #animals }}
+						{{ #Animals }}
 						<img src="/pic/{{MainPic.ID}}" style="width:100px"/>
-						{{ /animals }} 
+						{{ /Animals }}
 					</div>
 					<div class="col s6">
-						{{ #medicines }}
+						{{ #Medicines }}
 						<img src="/picMedicine/{{ID}}" style="width:100px"/>
-						{{ /medicines }} 
+						{{ /Medicines }}
 					</div>
 
 				</div>
@@ -68,12 +68,12 @@
 			<div class="card-stacked">
 				<div class="card-content">
 					<p>Os animals: </p>
-					<ol>{{ #animals }}<li>{{Name}}</li>{{ /animals }}</ol>
+					<ol>{{ #Animals }}<li>{{Name}}</li>{{ /Animals }}</ol>
 					<p>Foram medicados com:</p>
-					<ol>{{ #medicines }}<li>{{Name}}</li>{{ /medicines }}</ol>
+					<ol>{{ #Medicines }}<li>{{Name}}</li>{{ /Medicines }}</ol>
 				</div>
 				<div class="card-action">
-					{{ #animals }}<a href="/profile/{{ID}}">Show {{Name}}</a>{{ /animals }}
+					{{ #Animals }}<a href="/profile/{{ID}}">Show {{Name}}</a>{{ /Animals }}
 				</div>
 			</div>
 		</div>

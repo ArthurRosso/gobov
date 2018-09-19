@@ -13,10 +13,8 @@ type Medicine struct {
 	Type        *TypeMedicine
 	Picture     []byte       `gorm:"type:mediumblob"`
 	Medications []Medication `gorm:"many2many:medication_medicine"`
-	User        *User
 
-	UserID		int
-	TypeID 		int
+	TypeID int
 }
 
 func NewMedicine() Medicine {
