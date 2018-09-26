@@ -15,10 +15,14 @@ import (
 )
 
 var (
-	db               *gorm.DB
-	countAnimals     int
-	countMedicines   int
-	countMedications int
+	db                *gorm.DB
+	countAnimals      int
+	countMedicines    int
+	countMedications  int
+	countBreeds       int
+	countPurposes     int
+	countTypeAnimals  int
+	countTypeMedicnes int
 )
 
 func main() {
@@ -298,6 +302,23 @@ func getProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 func getAnimal(w http.ResponseWriter, r *http.Request) {
+	db.Table("breeds").Count(&countBreeds)
+	if countBreeds == 0 {
+		DataBreeds()
+	}
+	db.Table("purposes").Count(&countPurposes)
+	if countPurposes == 0 {
+		DataPurposes()
+	}
+	db.Table("type_animals").Count(&countTypeAnimals)
+	if countTypeAnimals == 0 {
+		DataTypeAnimals()
+	}
+	db.Table("type_medicines").Count(&countTypeMedicnes)
+	if countTypeMedicnes == 0 {
+		DataTypeMedicines()
+	}
+
 	animals := []Animal{}
 	db.Preload("Weights").Preload("Type").Preload("Breed").Preload("Purposes").Find(&animals, Animal{})
 
