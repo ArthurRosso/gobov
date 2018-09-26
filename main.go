@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 var (
@@ -21,7 +23,7 @@ var (
 )
 
 func main() {
-	db, _ = gorm.Open("mysql", "goboi:goboi@/goboi")
+	db, _ = gorm.Open("postgres", "postgres://wustlohuzuhqjc:dc7a2e1d5de838e91544e58f1311861034ba43ba43ff463b08cb32aa0e85ff5e@ec2-54-83-27-165.compute-1.amazonaws.com:5432/d1kp2gqbnrvpg")
 	defer db.Close()
 
 	db.AutoMigrate(&Animal{})
@@ -78,7 +80,8 @@ func main() {
 
 	fmt.Println("Server listen and serve on port 8000")
 
-	http.ListenAndServe(":8000", r)
+	port := os.Getenv("PORT")
+	http.ListenAndServe(":"+port, r)
 }
 
 func loggingMiddleware(next http.Handler) http.Handler {
