@@ -176,9 +176,9 @@ func logout(w http.ResponseWriter, r *http.Request) {
 func getIndex(w http.ResponseWriter, r *http.Request) {
 	ctx := GetContext(w, r)
 
-	db.Table("animals").Count(&countAnimals)
-	db.Table("medicines").Count(&countMedicines)
-	db.Table("medications").Count(&countMedications)
+	db.Where("user_id = ?", ctx.User.ID).Table("animals").Count(&countAnimals)
+	db.Where("user_id = ?", ctx.User.ID).Table("medicines").Count(&countMedicines)
+	db.Where("user_id = ?", ctx.User.ID).Table("medications").Count(&countMedications)
 
 	context := map[string]interface{}{
 		"user":     ctx.User,
@@ -193,7 +193,6 @@ func getIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func relAnimal(w http.ResponseWriter, r *http.Request) {
-
 	vars := mux.Vars(r)
 	idAnimal, _ := strconv.Atoi(vars["idAnimal"])
 	animal := Animal{}
@@ -302,6 +301,9 @@ func getProfile(w http.ResponseWriter, r *http.Request) {
 }
 
 func getAnimal(w http.ResponseWriter, r *http.Request) {
+
+	ctx := GetContext(w, r)
+
 	db.Table("breeds").Count(&countBreeds)
 	if countBreeds == 0 {
 		DataBreeds()
@@ -314,13 +316,9 @@ func getAnimal(w http.ResponseWriter, r *http.Request) {
 	if countTypeAnimals == 0 {
 		DataTypeAnimals()
 	}
-	db.Table("type_medicines").Count(&countTypeMedicnes)
-	if countTypeMedicnes == 0 {
-		DataTypeMedicines()
-	}
 
 	animals := []Animal{}
-	db.Preload("Weights").Preload("Type").Preload("Breed").Preload("Purposes").Find(&animals, Animal{})
+	db.Where("user_id = ?", ctx.User.ID).Preload("Weights").Preload("Type").Preload("Breed").Preload("Purposes").Find(&animals, Animal{})
 
 	fathers := []Animal{}
 	mothers := []Animal{}
@@ -357,8 +355,11 @@ func getAnimal(w http.ResponseWriter, r *http.Request) {
 }
 
 func getAllAnimals(w http.ResponseWriter, r *http.Request) {
+
+	ctx := GetContext(w, r)
+
 	animals := []Animal{}
-	db.Preload("Weights").Preload("Type").Preload("Breed").Preload("Purposes").Find(&animals, Animal{})
+	db.Where("user_id = ?", ctx.User.ID).Preload("Weights").Preload("Type").Preload("Breed").Preload("Purposes").Find(&animals, Animal{})
 
 	context := map[string]interface{}{
 		"animals": animals,
@@ -425,6 +426,9 @@ func postAnimal(w http.ResponseWriter, r *http.Request) {
 
 	files := m.File["Pictures"]
 
+	ctx := GetContext(w, r)
+	animal.User = ctx.User
+
 	db.Save(&animal)
 
 	if len(files) > 0 {
@@ -475,8 +479,15 @@ func delMedicine(w http.ResponseWriter, r *http.Request) {
 }
 
 func getMedicine(w http.ResponseWriter, r *http.Request) {
+
+	ctx := GetContext(w, r)
+
+	db.Table("type_medicines").Count(&countTypeMedicnes)
+	if countTypeMedicnes == 0 {
+		DataTypeMedicines()
+	}
 	medicines := []Medicine{}
-	db.Preload("Type").Find(&medicines, Medicine{})
+	db.Where("user_id = ?", ctx.User.ID).Preload("Type").Find(&medicines, Medicine{})
 
 	types := []TypeMedicine{}
 	db.Find(&types, &TypeMedicine{})
@@ -492,8 +503,11 @@ func getMedicine(w http.ResponseWriter, r *http.Request) {
 }
 
 func getAllMedicines(w http.ResponseWriter, r *http.Request) {
+
+	ctx := GetContext(w, r)
+
 	medicines := []Medicine{}
-	db.Preload("Type").Find(&medicines, Medicine{})
+	db.Where("user_id = ?", ctx.User.ID).Preload("Type").Find(&medicines, Medicine{})
 
 	context := map[string]interface{}{
 		"medicines": medicines,
@@ -529,17 +543,23 @@ func postMedicine(w http.ResponseWriter, r *http.Request) {
 	medicine.Picture, _ = ioutil.ReadAll(arquivo)
 	defer arquivo.Close()
 
+	ctx := GetContext(w, r)
+	medicine.User = ctx.User
+
 	db.Save(&medicine)
 
 	http.Redirect(w, r, "/medicine", http.StatusFound)
 }
 
 func getMedication(w http.ResponseWriter, r *http.Request) {
+
+	ctx := GetContext(w, r)
+
 	animals := []Animal{}
-	db.Find(&animals, &Animal{})
+	db.Where("user_id = ?", ctx.User.ID).Find(&animals, &Animal{})
 
 	medicines := []Medicine{}
-	db.Find(&medicines, &Medicine{})
+	db.Where("user_id = ?", ctx.User.ID).Find(&medicines, &Medicine{})
 
 	context := map[string]interface{}{
 		"animals":   animals,
@@ -552,8 +572,11 @@ func getMedication(w http.ResponseWriter, r *http.Request) {
 }
 
 func getAllMedications(w http.ResponseWriter, r *http.Request) {
+
+	ctx := GetContext(w, r)
+
 	medications := []Medication{}
-	db.Preload("Animals").Preload("Medicines").Find(&medications, Medication{})
+	db.Where("user_id = ?", ctx.User.ID).Preload("Animals").Preload("Medicines").Find(&medications, Medication{})
 
 	context := map[string]interface{}{
 		"medications": medications,
@@ -586,6 +609,9 @@ func postMedication(w http.ResponseWriter, r *http.Request) {
 		db.Find(&medicine, id)
 		medication.Medicines = append(medication.Medicines, medicine)
 	}
+
+	ctx := GetContext(w, r)
+	medication.User = ctx.User
 
 	db.Save(&medication)
 
