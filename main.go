@@ -9,10 +9,9 @@ import (
 	"time"
 
 	"github.com/cbroglie/mustache"
-	"github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
+	_ "github.com/lib/pq"
 )
 
 var (
@@ -235,7 +234,7 @@ func postWeight(w http.ResponseWriter, r *http.Request) {
 	weight.Description = r.PostFormValue("Description")
 
 	date, _ := time.Parse("2006-01-02", r.PostFormValue("Date"))
-	weight.Date = mysql.NullTime{Time: date, Valid: true}
+	weight.Date = date
 
 	vars := mux.Vars(r)
 	idAnimal, _ := strconv.Atoi(vars["idAnimal"])
@@ -369,12 +368,11 @@ func postAnimal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	birth, _ := time.Parse("2006-01-02", r.PostFormValue("Birthday"))
-	b := mysql.NullTime{Time: birth, Valid: true}
-	animal.Birthday = b
+	animal.Birthday = birth
 
 	weight := Weight{
 		Description: "Primeira pesagem",
-		Date:        b,
+		Date:        birth,
 	}
 	peso, _ := strconv.ParseFloat(r.PostFormValue("Weight"), 32)
 	weight.Weight = float32(peso)
@@ -490,7 +488,7 @@ func postMedicine(w http.ResponseWriter, r *http.Request) {
 	medicine.Name = r.PostFormValue("Name")
 
 	expiration, _ := time.Parse("2006-01-02", r.PostFormValue("Expiration"))
-	medicine.Expiration = mysql.NullTime{Time: expiration, Valid: true}
+	medicine.Expiration = expiration
 
 	medicine.Description = r.PostFormValue("Description")
 
@@ -550,7 +548,7 @@ func postMedication(w http.ResponseWriter, r *http.Request) {
 	medication.Description = r.PostFormValue("Description")
 
 	date, _ := time.Parse("2006-01-02", r.PostFormValue("Date"))
-	medication.Date = mysql.NullTime{Time: date, Valid: true}
+	medication.Date = date
 
 	r.ParseForm()
 	for _, idAnimals := range r.Form["Animal"] {
