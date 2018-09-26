@@ -11,6 +11,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 var (
@@ -22,8 +23,10 @@ var (
 
 func main() {
 	db, _ = gorm.Open("mysql", "goboi:goboi@/goboi")
+	defer db.Close()
 
 	db.AutoMigrate(&Animal{})
+	db.AutoMigrate(&User{})
 	db.AutoMigrate(&Weight{})
 	db.AutoMigrate(&TypeAnimal{})
 	db.AutoMigrate(&Breed{})
@@ -38,44 +41,143 @@ func main() {
 
 	r := mux.NewRouter()
 
-	r.HandleFunc("/", getIndex)
+	logado := r.PathPrefix("/").Subrouter()
+	logado.Use(loggingMiddleware)
 
-	r.HandleFunc("/pic/{idAnimal}", getPic)
-	r.HandleFunc("/picMedicine/{idMedicine}", getMedicinePic)
+	logado.HandleFunc("/", getIndex)
 
-	r.HandleFunc("/animal", getAnimal)
-	r.HandleFunc("/newAnimal", postAnimal)
-	r.HandleFunc("/delAnimal/{ID}", delAnimal)
+	logado.HandleFunc("/pic/{idAnimal}", getPic)
+	logado.HandleFunc("/picMedicine/{idMedicine}", getMedicinePic)
+
+	logado.HandleFunc("/animal", getAnimal)
+	logado.HandleFunc("/newAnimal", postAnimal)
+	logado.HandleFunc("/delAnimal/{ID}", delAnimal)
 	//r.HandleFunc("/editAnimal/{ID}", editAnimal)
-	r.HandleFunc("/relatorioAnimal/{idAnimal}", relAnimal)
-	r.HandleFunc("/listaAnimal", getAllAnimals)
+	logado.HandleFunc("/relatorioAnimal/{idAnimal}", relAnimal)
+	logado.HandleFunc("/listaAnimal", getAllAnimals)
 
-	r.HandleFunc("/weight/{idAnimal}", getWeight)
-	r.HandleFunc("/newWeight/{idAnimal}", postWeight)
-	r.HandleFunc("/delWeight/{idWeight}", delWeight)
+	logado.HandleFunc("/weight/{idAnimal}", getWeight)
+	logado.HandleFunc("/newWeight/{idAnimal}", postWeight)
+	logado.HandleFunc("/delWeight/{idWeight}", delWeight)
 
-	r.HandleFunc("/medicine", getMedicine)
-	r.HandleFunc("/newMedicine", postMedicine)
-	r.HandleFunc("/delMedicine/{ID}", delMedicine)
-	r.HandleFunc("/listaMedicine", getAllMedicines)
+	logado.HandleFunc("/medicine", getMedicine)
+	logado.HandleFunc("/newMedicine", postMedicine)
+	logado.HandleFunc("/delMedicine/{ID}", delMedicine)
+	logado.HandleFunc("/listaMedicine", getAllMedicines)
 
-	r.HandleFunc("/profile/{idAnimal}", getProfile)
+	logado.HandleFunc("/profile/{idAnimal}", getProfile)
 
-	r.HandleFunc("/medication", getMedication)
-	r.HandleFunc("/newMedication", postMedication)
-	r.HandleFunc("/listaMedication", getAllMedications)
+	logado.HandleFunc("/medication", getMedication)
+	logado.HandleFunc("/newMedication", postMedication)
+	logado.HandleFunc("/listaMedication", getAllMedications)
 
-	fmt.Println("Server listen and serve on port 80")
+	r.HandleFunc("/register", register)
+	r.HandleFunc("/checkRegister", checkRegister)
+	r.HandleFunc("/auth", auth)
+	r.HandleFunc("/login", login)
+	logado.HandleFunc("/logout", logout)
 
-	http.ListenAndServe(":80", r)
+	fmt.Println("Server listen and serve on port 8000")
+
+	http.ListenAndServe(":8000", r)
+}
+
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := GetContext(w, r)
+
+		if ctx.User == nil {
+			http.Redirect(w, r, "/login", http.StatusFound)
+		} else {
+			// Call the next handler, which can be another middleware in the chain, or the final handler.
+			next.ServeHTTP(w, r)
+		}
+	})
+}
+
+func register(w http.ResponseWriter, r *http.Request) {
+	context := map[string]interface{}{}
+
+	str, _ := mustache.RenderFile("templates/register.html", context)
+	bit := []byte(str)
+	w.Write(bit)
+}
+
+func checkRegister(w http.ResponseWriter, r *http.Request) {
+
+	// Authentication goes here
+	user := User{}
+	username := r.PostFormValue("Username")
+	password := r.PostFormValue("Password")
+	db.Where("username = ? AND password = ?", username, password).First(&user, User{})
+
+	if user.Username != "" {
+		http.Redirect(w, r, "/register", http.StatusFound)
+	} else {
+		user.Username = username
+		user.Password = password
+		user.Name = r.PostFormValue("Name")
+		user.Email = r.PostFormValue("Email")
+		db.Save(&user)
+
+		// Set user as authenticated
+		db.First(&user)
+
+		ctx := GetContext(w, r)
+		defer ctx.Close()
+		ctx.Session.Values["User.ID"] = user.ID
+
+		http.Redirect(w, r, "/", http.StatusFound)
+	}
+}
+
+func login(w http.ResponseWriter, r *http.Request) {
+	context := map[string]interface{}{}
+
+	str, _ := mustache.RenderFile("templates/login.html", context)
+	bit := []byte(str)
+	w.Write(bit)
+}
+
+func auth(w http.ResponseWriter, r *http.Request) {
+
+	// Authentication goes here
+	user := User{}
+	username := r.PostFormValue("Username")
+	password := r.PostFormValue("Password")
+	db.Where("username = ? AND password = ?", username, password).First(&user, User{})
+
+	if user.Username == "" {
+		http.Redirect(w, r, "/login", http.StatusFound)
+	} else {
+		ctx := GetContext(w, r)
+		ctx.Session.Values["User.ID"] = user.ID
+		ctx.Close()
+
+		http.Redirect(w, r, "/", http.StatusFound)
+	}
+}
+
+func logout(w http.ResponseWriter, r *http.Request) {
+
+	ctx := GetContext(w, r)
+
+	ctx.Session.Values = map[interface{}]interface{}{}
+
+	ctx.Close()
+
+	http.Redirect(w, r, "/login", http.StatusFound)
 }
 
 func getIndex(w http.ResponseWriter, r *http.Request) {
+	ctx := GetContext(w, r)
+
 	db.Table("animals").Count(&countAnimals)
 	db.Table("medicines").Count(&countMedicines)
 	db.Table("medications").Count(&countMedications)
 
 	context := map[string]interface{}{
+		"user":     ctx.User,
 		"counta":   countAnimals,
 		"countm":   countMedicines,
 		"countmed": countMedications,
@@ -87,6 +189,7 @@ func getIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func relAnimal(w http.ResponseWriter, r *http.Request) {
+
 	vars := mux.Vars(r)
 	idAnimal, _ := strconv.Atoi(vars["idAnimal"])
 	animal := Animal{}
@@ -143,7 +246,7 @@ func postWeight(w http.ResponseWriter, r *http.Request) {
 
 	url := "/weight/" + vars["idAnimal"]
 
-	http.Redirect(w, r, url, http.StatusMovedPermanently)
+	http.Redirect(w, r, url, http.StatusFound)
 }
 
 func delWeight(w http.ResponseWriter, r *http.Request) {
@@ -156,7 +259,7 @@ func delWeight(w http.ResponseWriter, r *http.Request) {
 
 	url := "/weight/" + id
 
-	http.Redirect(w, r, url, http.StatusMovedPermanently)
+	http.Redirect(w, r, url, http.StatusFound)
 }
 
 func getPic(w http.ResponseWriter, r *http.Request) {
@@ -318,7 +421,7 @@ func postAnimal(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	http.Redirect(w, r, "/animal", http.StatusMovedPermanently)
+	http.Redirect(w, r, "/animal", http.StatusFound)
 }
 
 func delAnimal(w http.ResponseWriter, r *http.Request) {
@@ -335,7 +438,7 @@ func delAnimal(w http.ResponseWriter, r *http.Request) {
 	db.Where("animal_id = ?", id).Delete(&Picture{})
 	db.Delete(&animal)
 
-	http.Redirect(w, r, "/animal", http.StatusMovedPermanently)
+	http.Redirect(w, r, "/animal", http.StatusFound)
 }
 
 func delMedicine(w http.ResponseWriter, r *http.Request) {
@@ -347,7 +450,7 @@ func delMedicine(w http.ResponseWriter, r *http.Request) {
 	db.Exec("DELETE FROM medication_medicine WHERE medicine_id=?", id)
 	db.Where("ID = ?", id).Delete(&Medicine{})
 
-	http.Redirect(w, r, "/medicine", http.StatusMovedPermanently)
+	http.Redirect(w, r, "/medicine", http.StatusFound)
 }
 
 func getMedicine(w http.ResponseWriter, r *http.Request) {
@@ -407,7 +510,7 @@ func postMedicine(w http.ResponseWriter, r *http.Request) {
 
 	db.Save(&medicine)
 
-	http.Redirect(w, r, "/medicine", http.StatusMovedPermanently)
+	http.Redirect(w, r, "/medicine", http.StatusFound)
 }
 
 func getMedication(w http.ResponseWriter, r *http.Request) {
@@ -465,5 +568,5 @@ func postMedication(w http.ResponseWriter, r *http.Request) {
 
 	db.Save(&medication)
 
-	http.Redirect(w, r, "/medication", http.StatusMovedPermanently)
+	http.Redirect(w, r, "/medication", http.StatusFound)
 }

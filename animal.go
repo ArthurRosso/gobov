@@ -19,7 +19,9 @@ type Animal struct {
 	Medications []Medication `gorm:"many2many:medication_animal"`
 	Mother      *Animal
 	Father      *Animal
+	User        *User
 
+	UserID   int
 	MotherID int
 	FatherID int
 	TypeID   int
