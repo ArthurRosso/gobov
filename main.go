@@ -11,7 +11,6 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 var (
@@ -54,7 +53,7 @@ func main() {
 	logado.HandleFunc("/animal", getAnimal)
 	logado.HandleFunc("/newAnimal", postAnimal)
 	logado.HandleFunc("/delAnimal/{ID}", delAnimal)
-	//r.HandleFunc("/editAnimal/{ID}", editAnimal)
+	//logado.HandleFunc("/editAnimal/{ID}", editAnimal)
 	logado.HandleFunc("/relatorioAnimal/{idAnimal}", relAnimal)
 	logado.HandleFunc("/listaAnimal", getAllAnimals)
 
