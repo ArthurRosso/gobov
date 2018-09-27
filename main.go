@@ -359,7 +359,8 @@ func delAnimal(w http.ResponseWriter, r *http.Request) {
 	animal := Animal{ID: id}
 
 	history := History{}
-	history.Description = "Exclusão realizada: " + animal.Name
+	name := animal.Name
+	history.Description = "Exclusão realizada: " + name
 	history.User = ctx.User
 	history.Animal = &animal
 	history.Date = time.Now()
@@ -386,7 +387,8 @@ func delMedicine(w http.ResponseWriter, r *http.Request) {
 	ctx := GetContext(w, r)
 
 	history := History{}
-	history.Description = "Exclusão realizada: " + medicine.Name
+	name := medicine.Name
+	history.Description = "Exclusão realizada: " + name
 	history.User = ctx.User
 	history.Date = time.Now()
 	db.Save(&history)
