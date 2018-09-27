@@ -9,7 +9,7 @@ type Medicine struct {
 	Expiration  time.Time
 	Description string
 	Type        *TypeMedicine
-	Picture     []byte       `gorm:"type:byte"`
+	Picture     []byte       `gorm:"type:bytea"`
 	Medications []Medication `gorm:"many2many:medication_medicine"`
 	User        *User
 
