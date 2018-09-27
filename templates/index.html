@@ -59,10 +59,18 @@
 
 
 			</div>
-
-			<div class="col s12 m8 l9"> <!-- Note that "m8 l9" was added -->
-
-			</div>
+			
+			{{#histories}}
+			<div class="col s12 m7">
+    			<div class="card horizontal">
+      			<div class="card-stacked">
+        			<div class="card-content">
+          			<p>{{Description}}</p>
+        			</div>
+      			</div>
+    			</div>
+  		</div>
+			{{/histories}}
 
 
 			<script type="text/javascript"

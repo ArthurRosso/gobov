@@ -1,21 +1,6 @@
 package main
 
-func Data() {
-	typeAnimal1 := TypeAnimal{}
-	typeAnimal1.Type = "Touro"
-	typeAnimal1.Description = "Macho bovino não castrado"
-	db.Save(&typeAnimal1)
-
-	typeAnimal2 := TypeAnimal{}
-	typeAnimal2.Type = "Vaca"
-	typeAnimal2.Description = "Fêmea bovina"
-	db.Save(&typeAnimal2)
-
-	typeAnimal3 := TypeAnimal{}
-	typeAnimal3.Type = "Boi"
-	typeAnimal3.Description = "Macho bovino castrado"
-	db.Save(&typeAnimal3)
-
+func DataBreeds() {
 	breed1 := Breed{}
 	breed1.Breed = "Angus"
 	breed1.Description = "Essa é a mais famosa raça de taurinos no Brasil. Seu nome ficou conhecido e a raça se popularizou especialmente a partir do investimento de grandes empresas, como o MC Donald’s, que criou um hambúrguer com a carne Angus. De acordo com a Associação Brasileira de Angus, as principais vantagens da raça para a criação são a alta fertilidade e precocidade, pois atingem a puberdade e o estado de abate mais cedo. Seu diferencial é a ótima qualidade da carne, que é marmorizada e macia."
@@ -70,7 +55,26 @@ func Data() {
 	breed11.Breed = "Charolês"
 	breed11.Description = "De origem francesa, essa raça taurina é excelente para produção de carne. Informações do Conselho Nacional de Pecuária de Corte indicam que, no Brasil, é também muito usada na criação de mestiços, como o gado Canchim. A raça possui pelagem branca ou creme, com narinas rosas e é uma das melhores para engorda em confinamento, porque chega a atingir, em machos adultos, mais de uma tonelada."
 	db.Save(&breed11)
+}
 
+func DataTypeAnimals() {
+	typeAnimal1 := TypeAnimal{}
+	typeAnimal1.Type = "Touro"
+	typeAnimal1.Description = "Macho bovino não castrado"
+	db.Save(&typeAnimal1)
+
+	typeAnimal2 := TypeAnimal{}
+	typeAnimal2.Type = "Vaca"
+	typeAnimal2.Description = "Fêmea bovina"
+	db.Save(&typeAnimal2)
+
+	typeAnimal3 := TypeAnimal{}
+	typeAnimal3.Type = "Boi"
+	typeAnimal3.Description = "Macho bovino castrado"
+	db.Save(&typeAnimal3)
+}
+
+func DataPurposes() {
 	purpose1 := Purpose{}
 	purpose1.Purpose = "Genética"
 	purpose1.Description = "Animal destinado a gerar descendentes.'"
@@ -85,4 +89,36 @@ func Data() {
 	purpose3.Purpose = "Engorda"
 	purpose3.Description = "Animal destinado a engorda para produção de carne."
 	db.Save(&purpose3)
+}
+
+func DataTypeMedicines() {
+	typeMedicine1 := TypeMedicine{}
+	typeMedicine1.Type = "Via Oral"
+	typeMedicine1.Description = "Caracterizada pela ingestão pela boca. Pode exercer efeitos locais no trato gastrointestinal ou atingir sangue e linfa provocando efeitos sistêmicos, após ser absorvido na mucosa gastrointestinal."
+	db.Save(&typeMedicine1)
+
+	typeMedicine2 := TypeMedicine{}
+	typeMedicine2.Type = "Via Intradérmica"
+	typeMedicine2.Description = "A injeção intradérmica consiste na aplicação de solução na derme (área localizada entre a derme e o tecido subcutâneo."
+	db.Save(&typeMedicine2)
+
+	typeMedicine3 := TypeMedicine{}
+	typeMedicine3.Type = "Via Subcutânea"
+	typeMedicine3.Description = "A injeção subcutânea consiste na aplicação de solução na região subcutânea, isto é, na hipoderme (tecido adiposo abaixo da pele)."
+	db.Save(&typeMedicine3)
+
+	typeMedicine4 := TypeMedicine{}
+	typeMedicine4.Type = "Via Intramuscular"
+	typeMedicine4.Description = "Consiste na aplicação de solução no tecido muscular."
+	db.Save(&typeMedicine4)
+
+	typeMedicine5 := TypeMedicine{}
+	typeMedicine5.Type = "Via Pour-on"
+	typeMedicine5.Description = "Consiste na aplicação sobre a linha média superior dos animais (espaço compreendido entre a cernelha e a inserção da cauda)."
+	db.Save(&typeMedicine5)
+
+	typeMedicine6 := TypeMedicine{}
+	typeMedicine6.Type = "Via Spray"
+	typeMedicine6.Description = "Consiste na aplicação pressionan a válvula do tubo e direcionan o jato para a região a ser tratada, pulverizando por alguns segundos."
+	db.Save(&typeMedicine6)
 }
