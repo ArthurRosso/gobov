@@ -80,7 +80,7 @@ func main() {
 	logado.HandleFunc("/logout", logout)
 
 	port := os.Getenv("PORT")
-	//fmt.Println("Server listen and serve on port"+port)
+	fmt.Println("Server listen and serve on port" + port)
 	http.ListenAndServe(":"+port, r)
 }
 
