@@ -2,51 +2,82 @@
 <html>
 <head>
 
-	<title>GoBov - Login</title>
+	<title>GoBov - Registro</title>
 
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css" />
+	<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css" media="screen,projection" />
 
 </head>
 
 <body>
 	<center>
 		<div class="container">
-			<div class="row">
-				<h5 id="title">Registrar</h5>
-				<form method="post" class="form-signin" action="/checkRegister">
+			<div class="card-panel">
+				<h4> Registro </h4>
+				<div class="row">
+					<form class="col s12" action="/checkRegister" method="post">
+						<div class="row">
+							<div class="input-field col s12">
+								<input id="username" name="Username" type="text" class="validate" required="" aria-required="true" minlength="3" >
+								<label for="username" data-error="Mínimo 3 caracteres" data-success="Isso aí">Nome de usuário</label>
+							</div>
+						</div>
+						<div class="row">
+							<div class="input-field col s6">
+								<input id="password" name="Password" type="password" class="validate" required="" aria-required="true" minlength="6">
+								<label for="password" data-error="Mínimo 6 caracteres" data-success="Isso aí">Senha</label>
+							</div>
+							<div class="input-field col s6">
+								<input id="passwordConfirm" type="password">
+								<label id="lblPasswordConfirm" for="passwordConfirm" data-error="As senhas estão diferentes" data-success="As senhas estão iguais">Confirmação da Senha</label>
+							</div>
+						</div>
+						<div class="row">
+							<div class="input-field col s12">
+								<input id="email" name="Email" type="email" class="validate" required="" aria-required="true">
+								<label for="email">E-mail</label>
+							</div>
+						</div>
+						<center><p>
+							Já possui um cadastro? <a href="/login">Entre</a> agora!
+						</p></center>
+						<div class="col s12"><br>
+							<button class="btn waves-effect waves-light teal darken-3"
+							type="submit" name="action">
+							Enviar <i class="material-icons right">send</i>
+						</button>
 
-					<div class="input-field">
-						Username: <input type="text" id="username" name="Username" /><label for="username"></label>
 					</div>
-					<div class="input-field">
-						Password: <input type="password" id="password" name="Password" />
-					</div>
-					<div class="input-field">
-						Name: <input type="text" id="name" name="Name" />
-					</div>
-					<div class="input-field">
-						Email <input type="text" id="email" name="Email" />
-					</div>
-					<center><p>
-						Já possui um cadastro? <a href="/login"">Entre</a> agora!
-					</p></center>
-					<div class="col s12"><br>
-						<button class="btn waves-effect waves-light teal darken-3"
-						type="submit" name="action">
-						Enviar <i class="material-icons right">send</i>
-					</button>
-
-				</div>
-			</form>
+				</form>
+			</div>
 		</div>
-
 	</div>
 </center>
 
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/additional-methods.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+<script>
+$("#password").on("focusout", function (e) {
+	if ($(this).val() != $("#passwordConfirm").val()) {
+		$("#passwordConfirm").removeClass("valid").addClass("invalid");
+	} else {
+		$("#passwordConfirm").removeClass("invalid").addClass("valid");
+	}
+});
+
+$("#passwordConfirm").on("keyup", function (e) {
+	if ($("#password").val() != $(this).val()) {
+		$(this).removeClass("valid").addClass("invalid");
+	} else {
+		$(this).removeClass("invalid").addClass("valid");
+	}
+});
+</script>
 </body>
 </html>

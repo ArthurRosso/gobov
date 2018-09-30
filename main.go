@@ -117,7 +117,6 @@ func checkRegister(w http.ResponseWriter, r *http.Request) {
 	} else {
 		user.Username = username
 		user.Password = password
-		user.Name = r.PostFormValue("Name")
 		user.Email = r.PostFormValue("Email")
 		db.Save(&user)
 
