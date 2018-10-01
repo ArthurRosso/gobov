@@ -2,15 +2,14 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/go-sql-driver/mysql"
+	"time"
 )
 
 type Animal struct {
 	ID          int
 	Name        string
 	Active      bool
-	Birthday    mysql.NullTime
+	Birthday    time.Time
 	Weights     []Weight
 	Type        *TypeAnimal
 	Breed       *Breed
@@ -33,7 +32,7 @@ func NewAnimal() Animal {
 }
 
 func (a Animal) BirthFmt() string {
-	return a.Birthday.Time.Format("02/01/2006")
+	return a.Birthday.Format("02/01/2006")
 }
 
 func (a Animal) WeightFmt() string {
@@ -61,4 +60,13 @@ func (a Animal) MainPic() Picture {
 	pic := Picture{}
 	db.Where("main=? and animal_id=?", 1, a.ID).First(&pic)
 	return pic
+}
+
+func (a Animal) Age() int {
+	now := time.Now()
+	years := now.Year() - a.Birthday.Year()
+	if now.YearDay() < a.Birthday.YearDay() {
+		years--
+	}
+	return years
 }

@@ -1,17 +1,15 @@
 package main
 
-import (
-	"github.com/go-sql-driver/mysql"
-)
+import "time"
 
 type Medicine struct {
 	ID          int
 	Name        string
 	Active      bool
-	Expiration  mysql.NullTime
+	Expiration  time.Time
 	Description string
 	Type        *TypeMedicine
-	Picture     []byte       `gorm:"type:mediumblob"`
+	Picture     []byte       `gorm:"type:bytea"`
 	Medications []Medication `gorm:"many2many:medication_medicine"`
 	User        *User
 
@@ -24,5 +22,5 @@ func NewMedicine() Medicine {
 }
 
 func (m Medicine) ExpirationFmt() string {
-	return m.Expiration.Time.Format("02/01/2006")
+	return m.Expiration.Format("02/01/2006")
 }

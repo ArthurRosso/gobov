@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/cbroglie/mustache"
-	"github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 )
@@ -25,7 +24,7 @@ var (
 )
 
 func main() {
-	db, _ = gorm.Open("mysql", "goboi:goboi@/goboi")
+	db, _ = gorm.Open("postgres", "postgres://xpieyukvbvsyvq:e72d85795745ac80d1a8be647f78d0ba37ffa195e8f1d3cedb10115081d1c710@ec2-23-23-216-40.compute-1.amazonaws.com:5432/d34bt8mlni8a8m")
 	defer db.Close()
 	db.AutoMigrate(&Animal{})
 	db.AutoMigrate(&User{})
@@ -52,7 +51,7 @@ func main() {
 	logado.HandleFunc("/animal", getAnimal)
 	logado.HandleFunc("/newAnimal", postAnimal)
 	logado.HandleFunc("/delAnimal/{ID}", delAnimal)
-	//logado.HandleFunc("/editAnimal/{ID}", editAnimal)
+	logado.HandleFunc("/editAnimal/{ID}", editAnimal)
 	logado.HandleFunc("/relatorioAnimal/{idAnimal}", relAnimal)
 	logado.HandleFunc("/listaAnimal", getAllAnimals)
 
@@ -281,7 +280,7 @@ func postAnimal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	birth, _ := time.Parse("2006-01-02", r.PostFormValue("Birthday"))
-	b := mysql.NullTime{Time: birth, Valid: true}
+	b := birth
 	animal.Birthday = b
 
 	weight := Weight{
@@ -347,6 +346,52 @@ func postAnimal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/animal", http.StatusFound)
+}
+
+func editAnimal(w http.ResponseWriter, r *http.Request) {
+
+	m := mux.Vars(r)
+	id, _ := strconv.Atoi(m["ID"])
+	animal := Animal{ID: id}
+
+	ctx := GetContext(w, r)
+
+	animals := []Animal{}
+	db.Where("user_id = ?", ctx.User.ID).Preload("Weights").Preload("Type").Preload("Breed").Preload("Purposes").Find(&animals, Animal{})
+
+	fathers := []Animal{}
+	mothers := []Animal{}
+	for _, i := range animals {
+		// element is the element from someSlice for where we are
+		if i.Type.Type == "Touro" {
+			fathers = append(fathers, i)
+		} else if i.Type.Type == "Vaca" {
+			mothers = append(mothers, i)
+		}
+	}
+
+	types := []TypeAnimal{}
+	db.Find(&types, &TypeAnimal{})
+
+	breeds := []Breed{}
+	db.Find(&breeds, &Breed{})
+
+	purposes := []Purpose{}
+	db.Find(&purposes, &Purpose{})
+
+	context := map[string]interface{}{
+		"animal":   animal,
+		"types":    types,
+		"breeds":   breeds,
+		"purposes": purposes,
+		"animals":  animals,
+		"mothers":  mothers,
+		"fathers":  fathers,
+	}
+
+	str, _ := mustache.RenderFile("templates/editAnimal.html", context)
+	bit := []byte(str)
+	w.Write(bit)
 }
 
 func delAnimal(w http.ResponseWriter, r *http.Request) {
@@ -441,7 +486,7 @@ func postMedicine(w http.ResponseWriter, r *http.Request) {
 	medicine.Name = name
 
 	expiration, _ := time.Parse("2006-01-02", r.PostFormValue("Expiration"))
-	medicine.Expiration = mysql.NullTime{Time: expiration, Valid: true}
+	medicine.Expiration = expiration
 
 	medicine.Description = r.PostFormValue("Description")
 
@@ -517,7 +562,7 @@ func postMedication(w http.ResponseWriter, r *http.Request) {
 	medication.Description = desc
 
 	date, _ := time.Parse("2006-01-02", r.PostFormValue("Date"))
-	medication.Date = mysql.NullTime{Time: date, Valid: true}
+	medication.Date = date
 
 	r.ParseForm()
 	for _, idAnimals := range r.Form["Animal"] {
@@ -638,7 +683,7 @@ func postWeight(w http.ResponseWriter, r *http.Request) {
 	weight.Description = desc
 
 	date, _ := time.Parse("2006-01-02", r.PostFormValue("Date"))
-	weight.Date = mysql.NullTime{Time: date, Valid: true}
+	weight.Date = date
 
 	vars := mux.Vars(r)
 	idAnimal, _ := strconv.Atoi(vars["idAnimal"])
