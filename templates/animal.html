@@ -45,32 +45,32 @@
 				<form method="post" action="/newAnimal" enctype="multipart/form-data" >
 					<div class="row">
 						<div class="input-field col s6">
-							Nome: <input type="text" name="Name" />
+							Indentificador: <input type="text" name="Name" class="validate" required="" aria-required="true" />
 						</div>
 						<div class="input-field col s6">
-							DataNasc: <input type="date" name="Birthday" />
+							Data de Nascimento: <input type="date" name="Birthday" class="validate" required="" aria-required="true" />
 						</div>
 						<div class="input-field col s6">
-							Peso: <input type="text" name="Weight" />
+							Peso atual: <input type="text" name="Weight" class="validate" required="" aria-required="true" />
 						</div>
 						<div class="input-field col s6">
-							Tipo: 
-							<select name="Type">
+							Tipo:
+							<select name="Type" class="validate" required="" aria-required="true">
 								{{ #types }}
 								<option value="{{ID}}">{{Type}}</option>
 								{{ /types }}
 							</select>
 						</div>
 						<div class="input-field col s6">
-							Raça: 
-							<select name="Breed">
+							Raça:
+							<select name="Breed" class="validate" required="" aria-required="true">
 								{{ #breeds }}
 								<option value="{{ID}}">{{Breed}}</option>
 								{{ /breeds }}
 							</select>
 						</div>
 						<div class="input-field col s6">
-							Finalidade: 
+							Finalidade:
 							<select multiple name="Purpose">
 								{{ #purposes }}
 								<option value="{{ID}}">{{Purpose}}</option>
@@ -78,8 +78,8 @@
 							</select>
 						</div>
 						<div class="input-field col s6">
-							Mãe: 
-							<select name="Mother">
+							Mãe:
+							<select name="Mother" class="validate" required="" aria-required="true">
 								<option value="0">Sem mãe</option>
 								{{ #mothers }}
 								<option value="{{ID}}">{{Name}}</option>
@@ -87,8 +87,8 @@
 							</select>
 						</div>
 						<div class="input-field col s6">
-							Pai: 
-							<select name="Father">
+							Pai:
+							<select name="Father" class="validate" required="" aria-required="true">
 								<option value="0">Sem pai</option>
 								{{ #fathers }}
 								<option value="{{ID}}">{{Name}}</option>

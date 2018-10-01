@@ -27,7 +27,6 @@ var (
 func main() {
 	db, _ = gorm.Open("mysql", "goboi:goboi@/goboi")
 	defer db.Close()
-
 	db.AutoMigrate(&Animal{})
 	db.AutoMigrate(&User{})
 	db.AutoMigrate(&Weight{})
@@ -635,7 +634,8 @@ func postWeight(w http.ResponseWriter, r *http.Request) {
 	weight := Weight{}
 	peso, _ := strconv.ParseFloat(r.PostFormValue("Weight"), 32)
 	weight.Weight = float32(peso)
-	weight.Description = r.PostFormValue("Description")
+	desc := r.PostFormValue("Description")
+	weight.Description = desc
 
 	date, _ := time.Parse("2006-01-02", r.PostFormValue("Date"))
 	weight.Date = mysql.NullTime{Time: date, Valid: true}
@@ -646,6 +646,14 @@ func postWeight(w http.ResponseWriter, r *http.Request) {
 	db.First(&animal, idAnimal)
 
 	weight.Animal = &animal
+
+	ctx := GetContext(w, r)
+	history := History{}
+	history.Description = "Pesagem realizada: " + desc + " do animal " + animal.Name
+	history.User = ctx.User
+	history.Animal = &animal
+	history.Date = time.Now()
+	db.Save(&history)
 
 	db.Save(&weight)
 
@@ -660,6 +668,17 @@ func delWeight(w http.ResponseWriter, r *http.Request) {
 	weight := Weight{}
 	db.Find(&weight, idWeight)
 	id := strconv.Itoa(weight.AnimalID)
+
+	ctx := GetContext(w, r)
+	history := History{}
+	animal := Animal{ID: weight.AnimalID}
+	db.First(&animal, weight.AnimalID)
+	history.Description = "Exclusão de pesagem realizada: " + weight.Description + " do animal " + animal.Name
+	history.User = ctx.User
+	history.Animal = &animal
+	history.Date = time.Now()
+	db.Save(&history)
+
 	db.Delete(&weight)
 
 	url := "/weight/" + id

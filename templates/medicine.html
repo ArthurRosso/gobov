@@ -45,17 +45,17 @@
 				<form method="post" action="/newMedicine" enctype="multipart/form-data" >
 					<div class="row">
 						<div class="input-field col s6">
-							Nome: <input type="text" name="Name" />
+							Nome: <input type="text" name="Name" class="validate" required="" aria-required="true" />
 						</div>
 						<div class="input-field col s6">
-							Validade: <input type="date" name="Expiration" />
+							Validade: <input type="date" name="Expiration" class="validate" required="" aria-required="true" />
 						</div>
 						<div class="input-field col s6">
 							Descrição: <input type="text" name="Description" />
 						</div>
 						<div class="input-field col s6">
-							Tipo: 
-							<select name="Type">
+							Tipo:
+							<select name="Type" class="validate" required="" aria-required="true">
 								{{ #types }}
 								<option value="{{ID}}">{{Type}}</option>
 								{{ /types }}
@@ -92,10 +92,10 @@ src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script
 src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 <script type="text/javascript">
-	$(document).ready(function() {
-		$(".button-collapse").sideNav();
-		$('select').material_select();
-	})
+$(document).ready(function() {
+	$(".button-collapse").sideNav();
+	$('select').material_select();
+})
 </script>
 
 </body>
