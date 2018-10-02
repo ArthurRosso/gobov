@@ -54,8 +54,8 @@
         <thead>
           <tr>
               <th>Nome</th>
-              <th>Validade</th>
               <th>Descrição</th>
+              <th>Validade</th>
               <th>Tipo</th>
               <th></th>
 							<th></th>
@@ -69,14 +69,14 @@
             <td>{{Description}}</td>
             <td>{{ExpirationFmt}}</td>
             <td>{{Type.Type}}</td>
-            <td><a href="#"><i class="material-icons left">edit</i></a></a></td>
+            <td><a href="/editMedicine/{{ID}}"><i class="material-icons left">edit</i></a></a></td>
             <td><a href="/delMedicine/{{ID}}"><i class="material-icons left">delete</i></a></a></td>
           </tr>
 					{{/medicines}}
         </tbody>
       </table>
 
-		
+
 </div>
 
 <script type="text/javascript"
