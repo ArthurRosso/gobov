@@ -28,7 +28,6 @@ var (
 func main() {
 	db, _ = gorm.Open("postgres", "postgres://xpieyukvbvsyvq:e72d85795745ac80d1a8be647f78d0ba37ffa195e8f1d3cedb10115081d1c710@ec2-23-23-216-40.compute-1.amazonaws.com:5432/d34bt8mlni8a8m")
 	defer db.Close()
-
 	db.AutoMigrate(&Animal{})
 	db.AutoMigrate(&User{})
 	db.AutoMigrate(&Weight{})
@@ -40,6 +39,19 @@ func main() {
 	db.AutoMigrate(&Picture{})
 	db.AutoMigrate(&Medication{})
 	db.AutoMigrate(&History{})
+
+	db.Table("breeds").Count(&countBreeds)
+	if countBreeds == 0 {
+		DataBreeds()
+	}
+	db.Table("purposes").Count(&countPurposes)
+	if countPurposes == 0 {
+		DataPurposes()
+	}
+	db.Table("type_animals").Count(&countTypeAnimals)
+	if countTypeAnimals == 0 {
+		DataTypeAnimals()
+	}
 
 	r := mux.NewRouter()
 
@@ -54,7 +66,8 @@ func main() {
 	logado.HandleFunc("/animal", getAnimal)
 	logado.HandleFunc("/newAnimal", postAnimal)
 	logado.HandleFunc("/delAnimal/{ID}", delAnimal)
-	//logado.HandleFunc("/editAnimal/{ID}", editAnimal)
+	logado.HandleFunc("/editAnimal/{ID}", editAnimal)
+	logado.HandleFunc("/renewAnimal/{ID}", repostAnimal)
 	logado.HandleFunc("/relatorioAnimal/{idAnimal}", relAnimal)
 	logado.HandleFunc("/listaAnimal", getAllAnimals)
 
@@ -118,7 +131,6 @@ func checkRegister(w http.ResponseWriter, r *http.Request) {
 	} else {
 		user.Username = username
 		user.Password = password
-		user.Name = r.PostFormValue("Name")
 		user.Email = r.PostFormValue("Email")
 		db.Save(&user)
 
@@ -197,19 +209,6 @@ func getIndex(w http.ResponseWriter, r *http.Request) {
 func getAnimal(w http.ResponseWriter, r *http.Request) {
 
 	ctx := GetContext(w, r)
-
-	db.Table("breeds").Count(&countBreeds)
-	if countBreeds == 0 {
-		DataBreeds()
-	}
-	db.Table("purposes").Count(&countPurposes)
-	if countPurposes == 0 {
-		DataPurposes()
-	}
-	db.Table("type_animals").Count(&countTypeAnimals)
-	if countTypeAnimals == 0 {
-		DataTypeAnimals()
-	}
 
 	animals := []Animal{}
 	db.Where("user_id = ?", ctx.User.ID).Preload("Weights").Preload("Type").Preload("Breed").Preload("Purposes").Find(&animals, Animal{})
@@ -351,12 +350,160 @@ func postAnimal(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/animal", http.StatusFound)
 }
 
+func editAnimal(w http.ResponseWriter, r *http.Request) {
+	ctx := GetContext(w, r)
+	m := mux.Vars(r)
+	id, _ := strconv.Atoi(m["ID"])
+	animal := Animal{ID: id}
+	db.Where("user_id = ?", ctx.User.ID).Preload("Weights").Preload("Type").Preload("Breed").Preload("Purposes").Find(&animal, Animal{})
+
+	animals := []Animal{}
+	db.Where("user_id = ?", ctx.User.ID).Preload("Weights").Preload("Type").Preload("Breed").Preload("Purposes").Find(&animals, Animal{})
+
+	fathers := []Animal{}
+	mothers := []Animal{}
+	for _, i := range animals {
+		// element is the element from someSlice for where we are
+		if i.Type.Type == "Touro" {
+			fathers = append(fathers, i)
+		} else if i.Type.Type == "Vaca" {
+			mothers = append(mothers, i)
+		}
+	}
+
+	types := []TypeAnimal{}
+	db.Find(&types, &TypeAnimal{})
+
+	breeds := []Breed{}
+	db.Find(&breeds, &Breed{})
+
+	purposes := []Purpose{}
+	db.Find(&purposes, &Purpose{})
+
+	context := map[string]interface{}{
+		"animal":   animal,
+		"types":    types,
+		"breeds":   breeds,
+		"purposes": purposes,
+		"animals":  animals,
+		"mothers":  mothers,
+		"fathers":  fathers,
+	}
+
+	str, _ := mustache.RenderFile("templates/editAnimal.html", context)
+	bit := []byte(str)
+	w.Write(bit)
+}
+
+func repostAnimal(w http.ResponseWriter, r *http.Request) {
+
+	ctx := GetContext(w, r)
+
+	mvar := mux.Vars(r)
+	id, _ := strconv.Atoi(mvar["ID"])
+	animal := Animal{ID: id}
+	db.Find(&animal, &Animal{})
+
+	db.Preload("Medications").Preload("Purposes").First(&animal)
+
+	db.Exec("DELETE FROM weights WHERE animal_id=?", id)
+	db.Exec("DELETE FROM animal_purpose WHERE animal_id=?", id)
+	db.Exec("DELETE FROM medication_animal WHERE animal_id=?", id)
+
+	db.Where("animal_id = ?", id).Delete(&Picture{})
+
+	db.Delete(&animal)
+
+	animal = NewAnimal()
+	name := r.PostFormValue("Name")
+	animal.Name = name
+
+	motherID, _ := strconv.Atoi(r.PostFormValue("Mother"))
+	if motherID != 0 {
+		mother := Animal{}
+		db.Find(&mother, Animal{ID: motherID})
+		animal.Mother = &mother
+	}
+
+	fatherID, _ := strconv.Atoi(r.PostFormValue("Father"))
+	if fatherID != 0 {
+		father := Animal{}
+		db.First(&father, Animal{ID: fatherID})
+		animal.Father = &father
+	}
+
+	birth, _ := time.Parse("2006-01-02", r.PostFormValue("Birthday"))
+	animal.Birthday = birth
+
+	weight := Weight{
+		Description: "Primeira pesagem",
+		Date:        birth,
+	}
+	peso, _ := strconv.ParseFloat(r.PostFormValue("Weight"), 32)
+	weight.Weight = float32(peso)
+	animal.Weights = append(animal.Weights, weight)
+
+	typeA := TypeAnimal{}
+	idType, _ := strconv.Atoi(r.PostFormValue("Type"))
+	db.Find(&typeA, idType)
+	animal.Type = &typeA
+	db.First(&animal.Type, idType)
+
+	breed := Breed{}
+	idBreed, _ := strconv.Atoi(r.PostFormValue("Breed"))
+	db.Find(&breed, idBreed)
+	animal.Breed = &breed
+	db.First(&animal.Breed, idBreed)
+
+	r.ParseForm()
+	for _, idPurposes := range r.Form["Purpose"] {
+		// element is the element from someSlice for where we are
+		purpose := Purpose{}
+		id, _ := strconv.Atoi(idPurposes)
+		db.Find(&purpose, id)
+		animal.Purposes = append(animal.Purposes, purpose)
+	}
+
+	r.ParseMultipartForm(0)
+	m := r.MultipartForm
+
+	files := m.File["Pictures"]
+
+	history := History{}
+	history.Description = "Animal editado: " + name
+	history.User = ctx.User
+	history.Animal = &animal
+	history.Date = time.Now()
+
+	animal.User = ctx.User
+
+	db.Save(&animal)
+
+	if len(files) > 0 {
+		pic := Picture{Main: true, AnimalID: animal.ID}
+		arquivo, _ := files[0].Open()
+		pic.Picture, _ = ioutil.ReadAll(arquivo)
+		defer arquivo.Close()
+		db.Save(&pic)
+		for _, file := range files[1:] {
+			picture := Picture{AnimalID: animal.ID}
+			arquivo, _ := file.Open()
+			picture.Picture, _ = ioutil.ReadAll(arquivo)
+			defer arquivo.Close()
+			db.Save(&picture)
+		}
+	}
+
+	http.Redirect(w, r, "/animal", http.StatusFound)
+}
+
 func delAnimal(w http.ResponseWriter, r *http.Request) {
 	ctx := GetContext(w, r)
 
 	m := mux.Vars(r)
 	id, _ := strconv.Atoi(m["ID"])
 	animal := Animal{ID: id}
+	db.Find(&animal, &Animal{})
 
 	history := History{}
 	name := animal.Name
@@ -580,12 +727,19 @@ func getProfile(w http.ResponseWriter, r *http.Request) {
 	animal := Animal{ID: idAnimal}
 	db.Preload("Weights").Preload("Type").Preload("Breed").Preload("Purposes").Preload("Father").Preload("Mother").Preload("Pictures").First(&animal, idAnimal)
 
+	ctx := GetContext(w, r)
+
+	if animal.UserID != ctx.User.ID {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
+
 	histories := []History{}
 
 	medication := Medication{}
 	db.Model(&animal).Related(&medication, "Medications")
 
-	db.Where("animal_id = ?", animal.ID).Or("medication_id = ?", medication.ID).Find(&histories, History{})
+	db.Where("animal_id = ?", animal.ID).Find(&histories, History{})
 
 	context := map[string]interface{}{
 		"histories": histories,
@@ -638,7 +792,8 @@ func postWeight(w http.ResponseWriter, r *http.Request) {
 	weight := Weight{}
 	peso, _ := strconv.ParseFloat(r.PostFormValue("Weight"), 32)
 	weight.Weight = float32(peso)
-	weight.Description = r.PostFormValue("Description")
+	desc := r.PostFormValue("Description")
+	weight.Description = desc
 
 	date, _ := time.Parse("2006-01-02", r.PostFormValue("Date"))
 	weight.Date = date
@@ -649,6 +804,14 @@ func postWeight(w http.ResponseWriter, r *http.Request) {
 	db.First(&animal, idAnimal)
 
 	weight.Animal = &animal
+
+	ctx := GetContext(w, r)
+	history := History{}
+	history.Description = "Pesagem realizada: " + desc + " do animal " + animal.Name
+	history.User = ctx.User
+	history.Animal = &animal
+	history.Date = time.Now()
+	db.Save(&history)
 
 	db.Save(&weight)
 
@@ -663,6 +826,17 @@ func delWeight(w http.ResponseWriter, r *http.Request) {
 	weight := Weight{}
 	db.Find(&weight, idWeight)
 	id := strconv.Itoa(weight.AnimalID)
+
+	ctx := GetContext(w, r)
+	history := History{}
+	animal := Animal{ID: weight.AnimalID}
+	db.First(&animal, weight.AnimalID)
+	history.Description = "Exclusão de pesagem realizada: " + weight.Description + " do animal " + animal.Name
+	history.User = ctx.User
+	history.Animal = &animal
+	history.Date = time.Now()
+	db.Save(&history)
+
 	db.Delete(&weight)
 
 	url := "/weight/" + id

@@ -35,6 +35,10 @@ func (a Animal) BirthFmt() string {
 	return a.Birthday.Format("02/01/2006")
 }
 
+func (a Animal) BirthPFmt() string {
+	return a.Birthday.Format("2006-01-02")
+}
+
 func (a Animal) WeightFmt() string {
 	if len(a.Weights) > 0 {
 		return fmt.Sprint(a.Weights[len(a.Weights)-1].Weight)
@@ -60,4 +64,13 @@ func (a Animal) MainPic() Picture {
 	pic := Picture{}
 	db.Where("main=? and animal_id=?", 1, a.ID).First(&pic)
 	return pic
+}
+
+func (a Animal) Age() int {
+	now := time.Now()
+	years := now.Year() - a.Birthday.Year()
+	if now.YearDay() < a.Birthday.YearDay() {
+		years--
+	}
+	return years
 }

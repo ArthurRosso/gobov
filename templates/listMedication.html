@@ -45,49 +45,47 @@
 
 	</header>
 
-	<div class="col s12 m8 l9"> <!-- Note that "m8 l9" was added -->
+	<div class="row container">
 
-		{{ #medications }}
-		<div class="card horizontal">
-			<div class="card-image">
-				<div class="row">
-
-					<div class="col s6">
-						{{ #Animals }}
-						<img src="/pic/{{MainPic.ID}}" style="width:100px"/>
-						{{ /Animals }}
-					</div>
-					<div class="col s6">
-						{{ #Medicines }}
-						<img src="/picMedicine/{{ID}}" style="width:100px"/>
-						{{ /Medicines }}
-					</div>
-
-				</div>
+		<!-- TODO: Fazer a pesquisa -->
+		<form>
+			<div class="input-field">
+				<i class="material-icons prefix">search</i>
+				<input id="search" type="search" required>
+				<i class="material-icons">close</i>
 			</div>
-			<div class="card-stacked">
-				<div class="card-content">
-					<p>Os animals: </p>
-					<ol>{{ #Animals }}<li>{{Name}}</li>{{ /Animals }}</ol>
-					<p>Foram medicados com:</p>
-					<ol>{{ #Medicines }}<li>{{Name}}</li>{{ /Medicines }}</ol>
-				</div>
-				<div class="card-action">
-					{{ #Animals }}<a href="/profile/{{ID}}">Show {{Name}}</a>{{ /Animals }}
-				</div>
-			</div>
-		</div>
-		{{ /medications }}
+		</form>
+
+		<table class="highlight responsive-table">
+			<thead>
+				<tr>
+					<th>Descrição</th>
+					<th>Data</th>
+					<th>Animais</th>
+					<th>Remédios</th>
+				</tr>
+			</thead>
+
+			<tbody>
+				{{ #medications }}
+				<tr>
+					<td>{{Description}}</td>
+					<td>{{DateFmt}}</td>
+					<td>{{AnimalsFmt}}</td>
+					<td>{{MedicinesFmt}}</td>
+				</tr>
+				{{ /medications }}
+			</tbody>
+		</table>
+
 	</div>
 
-</div>
-
-<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 
 
-<script type="text/javascript">
-</script>
+	<script type="text/javascript">
+	</script>
 
 </body>
 
