@@ -1,11 +1,11 @@
 package main
 
-import "time"
+import "github.com/go-sql-driver/mysql"
 
 type History struct {
 	ID          int
 	Description string
-	Date        time.Time
+	Date        mysql.NullTime
 	User        *User
 	Animal      *Animal
 	Medication  *Medication

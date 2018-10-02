@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
-	"time"
+
+	"github.com/go-sql-driver/mysql"
 )
 
 type Medication struct {
 	ID          int
 	Description string
-	Date        time.Time
+	Date        mysql.NullTime
 	Animals     []Animal   `gorm:"many2many:medication_animal"`
 	Medicines   []Medicine `gorm:"many2many:medication_medicine"`
 	User        *User
@@ -17,7 +18,7 @@ type Medication struct {
 }
 
 func (m Medication) DateFmt() string {
-	return m.Date.Format("02/01/2006")
+	return m.Date.Time.Format("02/01/2006")
 }
 
 func (m Medication) AnimalsFmt() string {

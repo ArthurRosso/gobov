@@ -42,20 +42,20 @@
 	<div class="row">
 		<div class="container">
 			<div class="card-panel">
-				<form method="post" action="/newAnimal" enctype="multipart/form-data" >
+				<form method="post" action="/renewAnimal/{{animal.ID}}" enctype="multipart/form-data" >
 					<div class="row">
 						<div class="input-field col s6">
-							Indentificador: <input placeholder="{{animal.Name}}" type="text" name="Name" class="validate" required="" aria-required="true" />
+							Indentificador: <input value="{{animal.Name}}" type="text" name="Name" class="validate" required="" aria-required="true" />
 						</div>
 						<div class="input-field col s6">
-							Data de Nascimento: <input placeholder="{{animal.Birthday}}" type="date" name="Birthday" class="validate" required="" aria-required="true" />
+							Data de Nascimento: <input value="{{animal.BirthPFmt}}" type="date" name="Birthday" class="validate" required="" aria-required="true" />
 						</div>
 						<div class="input-field col s6">
-							Peso atual: <input type="text" placeholder="{{animal.Weight}}" name="Weight" class="validate" required="" aria-required="true" />
+							Peso atual: <input value="{{animal.WeightFmt}}"  type="text" name="Weight" class="validate" required="" aria-required="true" />
 						</div>
 						<div class="input-field col s6">
 							Tipo:
-							<select name="Type" class="validate" required="" aria-required="true">
+							<select id="type" name="Type" class="validate" required="" aria-required="true">
 								{{ #types }}
 								<option value="{{ID}}">{{Type}}</option>
 								{{ /types }}
@@ -63,7 +63,7 @@
 						</div>
 						<div class="input-field col s6">
 							Raça:
-							<select name="Breed" class="validate" required="" aria-required="true">
+							<select id="breed" name="Breed" class="validate" required="" aria-required="true">
 								{{ #breeds }}
 								<option value="{{ID}}">{{Breed}}</option>
 								{{ /breeds }}
@@ -71,7 +71,7 @@
 						</div>
 						<div class="input-field col s6">
 							Finalidade:
-							<select multiple name="Purpose">
+							<select id="purposes" multiple name="Purpose">
 								{{ #purposes }}
 								<option value="{{ID}}">{{Purpose}}</option>
 								{{ /purposes }}
@@ -79,7 +79,7 @@
 						</div>
 						<div class="input-field col s6">
 							Mãe:
-							<select name="Mother" class="validate" required="" aria-required="true">
+							<select id="mother" name="Mother" class="validate" required="" aria-required="true">
 								<option value="0">Sem mãe</option>
 								{{ #mothers }}
 								<option value="{{ID}}">{{Name}}</option>
@@ -88,7 +88,7 @@
 						</div>
 						<div class="input-field col s6">
 							Pai:
-							<select name="Father" class="validate" required="" aria-required="true">
+							<select id="father" name="Father" class="validate" required="" aria-required="true">
 								<option value="0">Sem pai</option>
 								{{ #fathers }}
 								<option value="{{ID}}">{{Name}}</option>
@@ -103,7 +103,7 @@
 									<input name="Pictures" type="file" multiple>
 								</div>
 								<div class="file-path-wrapper">
-									<input class="file-path validate" name="Pictures" type="text" placeholder="Uma ou mais fotos.">
+									<input value="" class="file-path validate" name="Pictures" type="text" placeholder="Uma ou mais fotos.">
 								</div>
 							</div>
 						</div>
@@ -120,6 +120,7 @@
 			<a class="waves-effect waves-light btn teal darken-3" href="/listaAnimal"><i class="material-icons left">list</i>Lista de animais</a>
 		</div>
 	</div>
+</div>
 
 	<script type="text/javascript"
 	src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
@@ -128,6 +129,21 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$(".button-collapse").sideNav();
+			$('select').material_select();
+			$("#type").val({{animal.Type.ID}});
+			$("#breed").val({{animal.Breed.ID}});
+
+			var vet = [
+				{{#animal.Purposes}}
+					{{ID}},
+				{{/animal.Purposes}}
+			]
+
+			$.each(vet, function(i,e){
+			    $("#purposes option[value='" + e + "']").prop("selected", true);
+			});
+			$("#mother").val({{animal.MotherID}});
+			$("#father").val({{animal.FatherID}});
 			$('select').material_select();
 		})
 	</script>
