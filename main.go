@@ -26,7 +26,7 @@ var (
 )
 
 func main() {
-	db, _ = gorm.Open("postgres", "    postgres://xnpxdeegmmkufb:c20559c056a3df928e3221cac7410a16545835b7b4ba88a39222bdc8f63e2cfd@ec2-54-83-27-165.compute-1.amazonaws.com:5432/d1m41mmbmika6u")
+	db, _ = gorm.Open("postgres", "postgres://xnpxdeegmmkufb:c20559c056a3df928e3221cac7410a16545835b7b4ba88a39222bdc8f63e2cfd@ec2-54-83-27-165.compute-1.amazonaws.com:5432/d1m41mmbmika6u")
 	defer db.Close()
 	db.AutoMigrate(&Animal{})
 	db.AutoMigrate(&User{})
