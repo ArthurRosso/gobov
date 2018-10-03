@@ -623,7 +623,7 @@ func postMedicine(w http.ResponseWriter, r *http.Request) {
 	medicine.Name = name
 
 	expiration, _ := time.Parse("2006-01-02", r.PostFormValue("Expiration"))
-	medicine.Expiration = mysql.NullTime{Time: expiration, Valid: true}
+	medicine.Expiration = expiration
 
 	medicine.Description = r.PostFormValue("Description")
 
@@ -671,7 +671,7 @@ func repostMedicine(w http.ResponseWriter, r *http.Request) {
 	medicine.Name = name
 
 	expiration, _ := time.Parse("2006-01-02", r.PostFormValue("Expiration"))
-	medicine.Expiration = mysql.NullTime{Time: expiration, Valid: true}
+	medicine.Expiration = expiration
 
 	medicine.Description = r.PostFormValue("Description")
 
