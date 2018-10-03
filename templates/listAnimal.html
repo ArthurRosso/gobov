@@ -96,13 +96,16 @@
 	    table = document.getElementById("myTable");
 	    tr = table.getElementsByTagName("tr");
 	    for (i = 0; i < tr.length; i++) {
-	      td = tr[i].getElementsByTagName("td")[0];
-	      if (td) {
-		if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
-		  tr[i].style.display = "";
-		} else {
-		  tr[i].style.display = "none";
-		}
+	    	nome = tr[i].getElementsByTagName("td")[0];
+	    	tipo = tr[i].getElementsByTagName("td")[3];
+	    	raca = tr[i].getElementsByTagName("td")[4];
+	    	prop = tr[i].getElementsByTagName("td")[5];
+	    	if (nome || tipo || raca || prop) {
+				if (nome.innerHTML.toUpperCase().indexOf(filter) > -1 || tipo.innerHTML.toUpperCase().indexOf(filter) > -1 || raca.innerHTML.toUpperCase().indexOf(filter) > -1 || prop.innerHTML.toUpperCase().indexOf(filter) > -1) {
+		  		tr[i].style.display = "";
+			} else {
+		  		tr[i].style.display = "none";
+			}
 	      }       
 	    }
 	  }
