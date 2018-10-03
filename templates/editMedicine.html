@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<title>GoBov - Editar Remédio</title>
+
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css" />
+
+</head>
+
+<body>
+
+	<header>
+
+		<nav class="teal darken-4">
+			<div class="nav-wrapper">
+				<a href="/" class="brand-logo">GoBov</a> <a href="/"
+				data-activates="mobile-demo" class="button-collapse"><i
+				class="material-icons">menu</i></a>
+				<ul class="right hide-on-med-and-down">
+					<li><a href="/animal">Animal</a></li>
+					<li><a href="/medicine">Remédio</a></li>
+					<li><a href="/medication">Medicação</a></li>
+					<li><a href="/logout">Sair</a></li>
+				</ul>
+				<ul class="side-nav" id="mobile-demo">
+					<li><a href="/animal">Animal</a></li>
+					<li><a href="/medicine">Remédio</a></li>
+					<li><a href="/medication">Medicação</a></li>
+					<li><a href="/logout">Logout</a></li>
+				</ul>
+			</div>
+		</nav>
+
+	</header>
+
+	<div class="row">
+		<div class="container">
+			<div class="card-panel">
+				<form method="post" action="/renewMedicine/{{medicine.ID}}" enctype="multipart/form-data" >
+					<div class="row">
+						<div class="input-field col s6">
+							Nome: <input type="text" value="{{medicine.Name}}" name="Name" class="validate" required="" aria-required="true" />
+						</div>
+						<div class="input-field col s6">
+							Validade: <input type="date" value="{{medicine.ExpFmt}}" name="Expiration" class="validate" required="" aria-required="true" />
+						</div>
+						<div class="input-field col s6">
+							Descrição: <input type="text" value="{{medicine.Description}}" name="Description" />
+						</div>
+						<div class="input-field col s6">
+							Tipo:
+							<select id="type" name="Type" class="validate" required="" aria-required="true">
+								{{ #types }}
+								<option value="{{ID}}">{{Type}}</option>
+								{{ /types }}
+							</select>
+						</div>
+						<div class="input-field col s12">
+							<div class="file-field input-field">
+								<div class="btn teal darken-3">
+									<span>Fotos</span>
+									<input name="Picture" type="file" >
+								</div>
+								<div class="file-path-wrapper">
+									<input class="file-path validate" name="Picture" type="text" placeholder="Uma foto.">
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="right-align">
+						<button class="btn waves-effect waves-light teal darken-3"
+						type="submit" name="action">
+						Salvar <i class="material-icons right">save</i>
+					</button>
+				</div>
+			</form>
+		</div>
+		<div class="right-align">
+			<a class="waves-effect waves-light btn teal darken-3" href="/listaMedicine"><i class="material-icons left">list</i>Lista de remédios</a>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript"
+src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script
+src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+	$(".button-collapse").sideNav();
+	$('select').material_select();
+	$("#type").val({{medicine.Type.ID}});
+	$('select').material_select();
+})
+</script>
+
+</body>
+
+
+</html>

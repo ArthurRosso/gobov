@@ -51,12 +51,12 @@
 		<form>
 			<div class="input-field">
 				<i class="material-icons prefix">search</i>
-				<input id="search" type="search" required>
+				<input id="search" onkeyup="myFunction()" type="search" required>
 				<i class="material-icons">close</i>
 			</div>
 		</form>
 
-		<table class="highlight responsive-table">
+		<table id="myTable" class="highlight responsive-table">
 			<thead>
 				<tr>
 					<th>Descrição</th>
@@ -82,9 +82,28 @@
 
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
-
-
 	<script type="text/javascript">
+		$(document).ready(function() {
+			$(".button-collapse").sideNav();
+		})
+		
+		  function myFunction() {
+		    var input, filter, table, tr, td, i;
+		    input = document.getElementById("search");
+		    filter = input.value.toUpperCase();
+		    table = document.getElementById("myTable");
+		    tr = table.getElementsByTagName("tr");
+		    for (i = 0; i < tr.length; i++) {
+		      td = tr[i].getElementsByTagName("td")[0];
+		      if (td) {
+			if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+			  tr[i].style.display = "";
+			} else {
+			  tr[i].style.display = "none";
+			}
+		      }       
+		    }
+		  }
 	</script>
 
 </body>

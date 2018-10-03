@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/gorilla/sessions"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/sessions"
 )
 
 var store = sessions.NewCookieStore([]byte("secret"))
@@ -18,8 +19,15 @@ type Context struct {
 	r *http.Request
 }
 
-func (c *Context) Close() {
+func (c *Context) AddFlash(s string) {
+	c.Session.AddFlash(s)
+}
 
+func (c *Context) GetFlashes() []interface{} {
+	return c.Session.Flashes()
+}
+
+func (c *Context) Close() {
 	c.Session.Save(c.r, c.w)
 }
 

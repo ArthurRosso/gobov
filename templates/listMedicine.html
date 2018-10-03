@@ -41,21 +41,20 @@
 
 	<div class="row container">
 
-		<!-- TODO: Fazer a pesquisa -->
 		<form>
 			<div class="input-field">
 				<i class="material-icons prefix">search</i>
-				<input id="search" type="search" required>
+				<input id="search" onkeyup="myFunction()" type="search" required>
 				<i class="material-icons">close</i>
 			</div>
 		</form>
 
-		<table class="highlight responsive-table">
+	<table id="myTable" class="highlight responsive-table">
         <thead>
           <tr>
               <th>Nome</th>
-              <th>Validade</th>
               <th>Descrição</th>
+              <th>Validade</th>
               <th>Tipo</th>
               <th></th>
 							<th></th>
@@ -63,20 +62,20 @@
         </thead>
 
         <tbody>
-					{{#medicines}}
+	{{#medicines}}
           <tr>
             <td>{{Name}}</td>
             <td>{{Description}}</td>
             <td>{{ExpirationFmt}}</td>
             <td>{{Type.Type}}</td>
-            <td><a href="#"><i class="material-icons left">edit</i></a></a></td>
+            <td><a href="/editMedicine/{{ID}}"><i class="material-icons left">edit</i></a></a></td>
             <td><a href="/delMedicine/{{ID}}"><i class="material-icons left">delete</i></a></a></td>
           </tr>
-					{{/medicines}}
+	{{/medicines}}
         </tbody>
       </table>
 
-		
+
 </div>
 
 <script type="text/javascript"
@@ -88,6 +87,24 @@ src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.m
 		$(".button-collapse").sideNav();
 		$('select').material_select();
 	})
+	
+  function myFunction() {
+    var input, filter, table, tr, td, i;
+    input = document.getElementById("search");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("myTable");
+    tr = table.getElementsByTagName("tr");
+    for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[0];
+      if (td) {
+        if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
+      }       
+    }
+  }
 </script>
 
 </body>

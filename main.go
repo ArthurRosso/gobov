@@ -53,7 +53,14 @@ func main() {
 		DataTypeAnimals()
 	}
 
+	db.Table("type_medicines").Count(&countTypeMedicnes)
+	if countTypeMedicnes == 0 {
+		DataTypeMedicines()
+	}
+
 	r := mux.NewRouter()
+
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
 	logado := r.PathPrefix("/").Subrouter()
 	logado.Use(loggingMiddleware)
@@ -78,6 +85,8 @@ func main() {
 	logado.HandleFunc("/medicine", getMedicine)
 	logado.HandleFunc("/newMedicine", postMedicine)
 	logado.HandleFunc("/delMedicine/{ID}", delMedicine)
+	logado.HandleFunc("/editMedicine/{ID}", editMedicine)
+	logado.HandleFunc("/renewMedicine/{ID}", repostMedicine)
 	logado.HandleFunc("/listaMedicine", getAllMedicines)
 
 	logado.HandleFunc("/profile/{idAnimal}", getProfile)
@@ -146,7 +155,12 @@ func checkRegister(w http.ResponseWriter, r *http.Request) {
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
-	context := map[string]interface{}{}
+	ctx := GetContext(w, r)
+	err := ctx.GetFlashes()
+	ctx.Close()
+	context := map[string]interface{}{
+		"err": err,
+	}
 
 	str, _ := mustache.RenderFile("templates/login.html", context)
 	bit := []byte(str)
@@ -154,6 +168,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 }
 
 func auth(w http.ResponseWriter, r *http.Request) {
+	ctx := GetContext(w, r)
 
 	// Authentication goes here
 	user := User{}
@@ -162,9 +177,10 @@ func auth(w http.ResponseWriter, r *http.Request) {
 	db.Where("username = ? AND password = ?", username, password).First(&user, User{})
 
 	if user.Username == "" {
+		ctx.AddFlash("Nome de usuário ou senha incorreto")
+		ctx.Close()
 		http.Redirect(w, r, "/login", http.StatusFound)
 	} else {
-		ctx := GetContext(w, r)
 		ctx.Session.Values["User.ID"] = user.ID
 		ctx.Close()
 
@@ -547,13 +563,8 @@ func delMedicine(w http.ResponseWriter, r *http.Request) {
 }
 
 func getMedicine(w http.ResponseWriter, r *http.Request) {
-
 	ctx := GetContext(w, r)
 
-	db.Table("type_medicines").Count(&countTypeMedicnes)
-	if countTypeMedicnes == 0 {
-		DataTypeMedicines()
-	}
 	medicines := []Medicine{}
 	db.Where("user_id = ?", ctx.User.ID).Preload("Type").Find(&medicines, Medicine{})
 
@@ -566,6 +577,26 @@ func getMedicine(w http.ResponseWriter, r *http.Request) {
 	}
 
 	str, _ := mustache.RenderFile("templates/medicine.html", context)
+	bit := []byte(str)
+	w.Write(bit)
+}
+
+func editMedicine(w http.ResponseWriter, r *http.Request) {
+	ctx := GetContext(w, r)
+	m := mux.Vars(r)
+	id, _ := strconv.Atoi(m["ID"])
+	medicine := Medicine{ID: id}
+	db.Where("user_id = ?", ctx.User.ID).Preload("Type").First(&medicine, Medicine{})
+
+	types := []TypeMedicine{}
+	db.Find(&types, &TypeMedicine{})
+
+	context := map[string]interface{}{
+		"types":    types,
+		"medicine": medicine,
+	}
+
+	str, _ := mustache.RenderFile("templates/editMedicine.html", context)
 	bit := []byte(str)
 	w.Write(bit)
 }
@@ -592,7 +623,7 @@ func postMedicine(w http.ResponseWriter, r *http.Request) {
 	medicine.Name = name
 
 	expiration, _ := time.Parse("2006-01-02", r.PostFormValue("Expiration"))
-	medicine.Expiration = expiration
+	medicine.Expiration = mysql.NullTime{Time: expiration, Valid: true}
 
 	medicine.Description = r.PostFormValue("Description")
 
@@ -625,6 +656,48 @@ func postMedicine(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/medicine", http.StatusFound)
 }
 
+func repostMedicine(w http.ResponseWriter, r *http.Request) {
+	ctx := GetContext(w, r)
+	m := mux.Vars(r)
+	id, _ := strconv.Atoi(m["ID"])
+	medicine := Medicine{ID: id}
+	db.Preload("Medications").First(&medicine)
+
+	db.Exec("DELETE FROM medication_medicine WHERE medicine_id=?", id)
+	db.Where("ID = ?", id).Delete(&Medicine{})
+
+	medicine = NewMedicine()
+	name := r.PostFormValue("Name")
+	medicine.Name = name
+
+	expiration, _ := time.Parse("2006-01-02", r.PostFormValue("Expiration"))
+	medicine.Expiration = mysql.NullTime{Time: expiration, Valid: true}
+
+	medicine.Description = r.PostFormValue("Description")
+
+	typeM := TypeMedicine{}
+	idType, _ := strconv.Atoi(r.PostFormValue("Type"))
+	db.Find(&typeM, idType)
+	medicine.Type = &typeM
+	db.First(&medicine.Type, idType)
+
+	r.ParseMultipartForm(0)
+	f := r.MultipartForm
+	if f == nil {
+		fmt.Println("Erro no formulário")
+	}
+	file := f.File["Picture"]
+	arquivo, _ := file[0].Open()
+	medicine.Picture, _ = ioutil.ReadAll(arquivo)
+	defer arquivo.Close()
+
+	medicine.User = ctx.User
+
+	db.Save(&medicine)
+
+	http.Redirect(w, r, "/medicine", http.StatusFound)
+}
+
 func getMedication(w http.ResponseWriter, r *http.Request) {
 
 	ctx := GetContext(w, r)
@@ -646,7 +719,6 @@ func getMedication(w http.ResponseWriter, r *http.Request) {
 }
 
 func getAllMedications(w http.ResponseWriter, r *http.Request) {
-
 	ctx := GetContext(w, r)
 
 	medications := []Medication{}
@@ -701,9 +773,16 @@ func postMedication(w http.ResponseWriter, r *http.Request) {
 }
 
 func getPic(w http.ResponseWriter, r *http.Request) {
+	ctx := GetContext(w, r)
 	vars := mux.Vars(r)
 	idAnimal, _ := strconv.Atoi(vars["idAnimal"])
 	picture := Picture{}
+	animal := Animal{}
+	db.First(&animal, idAnimal)
+	if animal.UserID != ctx.User.ID {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
 	db.First(&picture, idAnimal)
 	if len(picture.Picture) > 0 {
 		w.Write(picture.Picture)
@@ -711,10 +790,15 @@ func getPic(w http.ResponseWriter, r *http.Request) {
 }
 
 func getMedicinePic(w http.ResponseWriter, r *http.Request) {
+	ctx := GetContext(w, r)
 	vars := mux.Vars(r)
 	medicine := Medicine{}
 	idMedicine, _ := strconv.Atoi(vars["idMedicine"])
 	db.First(&medicine, idMedicine)
+	if medicine.UserID != ctx.User.ID {
+		http.Redirect(w, r, "/", http.StatusFound)
+		return
+	}
 	if len(medicine.Picture) > 0 {
 		w.Write(medicine.Picture)
 	}
