@@ -808,7 +808,7 @@ func getProfile(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	idAnimal, _ := strconv.Atoi(vars["idAnimal"])
 	animal := Animal{ID: idAnimal}
-	db.Preload("Weights").Preload("Type").Preload("Breed").Preload("Purposes").Preload("Father").Preload("Mother").Preload("Pictures").First(&animal, idAnimal)
+	db.Preload("Medications").Preload("Weights").Preload("Type").Preload("Breed").Preload("Purposes").Preload("Father").Preload("Mother").Preload("Pictures").First(&animal, idAnimal)
 
 	ctx := GetContext(w, r)
 
@@ -822,7 +822,7 @@ func getProfile(w http.ResponseWriter, r *http.Request) {
 	medication := Medication{}
 	db.Model(&animal).Related(&medication, "Medications")
 
-	db.Where("animal_id = ?", animal.ID).Find(&histories, History{})
+	db.Where("animal_id = ? OR medication_id = ?", animal.ID, medication.ID).Find(&histories, History{})
 
 	context := map[string]interface{}{
 		"histories": histories,
