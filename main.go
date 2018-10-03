@@ -604,13 +604,12 @@ func postMedicine(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseMultipartForm(0)
 	f := r.MultipartForm
-	if f == nil {
-		fmt.Println("Erro no formulário")
-	}
+	if f == nil {	
 	file := f.File["Picture"]
 	arquivo, _ := file[0].Open()
 	medicine.Picture, _ = ioutil.ReadAll(arquivo)
 	defer arquivo.Close()
+	}
 
 	ctx := GetContext(w, r)
 	medicine.User = ctx.User
