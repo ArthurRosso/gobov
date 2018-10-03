@@ -57,7 +57,7 @@
               <th>Validade</th>
               <th>Tipo</th>
               <th></th>
-							<th></th>
+			  <th></th>
           </tr>
         </thead>
 
@@ -95,9 +95,11 @@ src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.m
     table = document.getElementById("myTable");
     tr = table.getElementsByTagName("tr");
     for (i = 0; i < tr.length; i++) {
-      td = tr[i].getElementsByTagName("td")[0];
-      if (td) {
-        if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+      nome = tr[i].getElementsByTagName("td")[0];
+      desc = tr[i].getElementsByTagName("td")[1];
+      tipo = tr[i].getElementsByTagName("td")[3];
+      if (nome || desc || tipo) {
+        if (nome.innerHTML.toUpperCase().indexOf(filter) > -1 || desc.innerHTML.toUpperCase().indexOf(filter) > -1 || tipo.innerHTML.toUpperCase().indexOf(filter) > -1) {
           tr[i].style.display = "";
         } else {
           tr[i].style.display = "none";

@@ -94,9 +94,11 @@
 		    table = document.getElementById("myTable");
 		    tr = table.getElementsByTagName("tr");
 		    for (i = 0; i < tr.length; i++) {
-		      td = tr[i].getElementsByTagName("td")[0];
+		      desc = tr[i].getElementsByTagName("td")[0];
+		      a = tr[i].getElementsByTagName("td")[2];
+		      m = tr[i].getElementsByTagName("td")[3];
 		      if (td) {
-			if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+			if (desc.innerHTML.toUpperCase().indexOf(filter) > -1 || a.innerHTML.toUpperCase().indexOf(filter) > -1  || m.innerHTML.toUpperCase().indexOf(filter) > -1) {
 			  tr[i].style.display = "";
 			} else {
 			  tr[i].style.display = "none";
