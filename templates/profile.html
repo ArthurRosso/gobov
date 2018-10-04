@@ -21,25 +21,7 @@
 
 	<header>
 
-		<nav class="teal darken-4">
-			<div class="nav-wrapper">
-				<a href="/" class="brand-logo">GoBov</a> <a href="/"
-				data-activates="mobile-demo" class="button-collapse"><i
-				class="material-icons">menu</i></a>
-				<ul class="right hide-on-med-and-down">
-					<li><a href="/animal">Animal</a></li>
-					<li><a href="/medicine">Remédio</a></li>
-					<li><a href="/medication">Medicação</a></li>
-					<li><a href="/logout">Sair</a></li>
-				</ul>
-				<ul class="side-nav" id="mobile-demo">
-					<li><a href="/animal">Animal</a></li>
-					<li><a href="/medicine">Remédio</a></li>
-					<li><a href="/medication">Medicação</a></li>
-					<li><a href="/logout">Sair</a></li>
-				</ul>
-			</div>
-		</nav>
+		{{{content}}}
 
 	</header>
 
@@ -64,7 +46,7 @@
 			<div class="row">
 				<div class="card-panel">
 					<div class="center-align">
-						<img src="/pic/{{animal.MainPic.ID}}" alt="Avatar" style="width:200px">
+						<img src="/pic/{{animal.MainPic.ID}}" alt="Animal sem foto" style="width:200px">
 					</div>
 					<div class="center-align">
 						<span>{{animal.Name}}</span>

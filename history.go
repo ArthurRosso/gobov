@@ -7,7 +7,7 @@ type History struct {
 	Description string
 	Date        mysql.NullTime
 	User        *User
-	Animal      *Animal
+	Animals     []*Animal `gorm:"many2many:animal_history"`
 	Medication  *Medication
 
 	UserID       int

@@ -21,6 +21,7 @@ type Animal struct {
 	Mother      *Animal
 	Father      *Animal
 	User        *User
+	Histories   []History `gorm:"many2many:animal_history"`
 
 	UserID   int
 	MotherID int

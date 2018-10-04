@@ -17,25 +17,7 @@
 
 	<header>
 
-		<nav class="teal darken-4">
-			<div class="nav-wrapper">
-				<a href="/" class="brand-logo">GoBov</a> <a href="/"
-				data-activates="mobile-demo" class="button-collapse"><i
-				class="material-icons">menu</i></a>
-				<ul class="right hide-on-med-and-down">
-					<li><a href="/animal">Animal</a></li>
-					<li><a href="/medicine">Remédio</a></li>
-					<li><a href="/medication">Medicação</a></li>
-					<li><a href="/logout">Sair</a></li>
-				</ul>
-				<ul class="side-nav" id="mobile-demo">
-					<li><a href="/animal">Animal</a></li>
-					<li><a href="/medicine">Remédio</a></li>
-					<li><a href="/Medication">Medicação</a></li>
-					<li><a href="/logout">Sair</a></li>
-				</ul>
-			</div>
-		</nav>
+		{{{content}}}
 
 	</header>
 
@@ -45,13 +27,20 @@
 				<form method="post" action="/newAnimal" enctype="multipart/form-data" >
 					<div class="row">
 						<div class="input-field col s6">
-							Indentificador: <input type="text" name="Name" class="validate" required="" aria-required="true" />
+							Indentificador (Nome): <input type="text" name="Name" class="validate" required="" aria-required="true" />
 						</div>
 						<div class="input-field col s6">
 							Data de Nascimento: <input type="date" name="Birthday" class="validate" required="" aria-required="true" />
 						</div>
 						<div class="input-field col s6">
-							Peso atual: <input type="text" name="Weight" class="validate" required="" aria-required="true" />
+							<div class="row">
+								<div class="col s11 valign-wrapper">
+									Peso atual: <input type="number" name="Weight" class="validate" required="" aria-required="true" />
+								</div>
+								<div class="col s1 valign-wrapper">
+									kg
+								</div>
+							</div>
 						</div>
 						<div class="input-field col s6">
 							Tipo:
@@ -99,7 +88,7 @@
 						<div class="input-field col s12">
 							<div class="file-field input-field">
 								<div class="btn teal darken-3">
-									<span>Fotos</span>
+									<span>Fotos <small>(opcional)</small></span>
 									<input name="Pictures" type="file" multiple>
 								</div>
 								<div class="file-path-wrapper">
@@ -116,9 +105,6 @@
 				</div>
 			</form>
 		</div>
-		<div class="right-align">
-			<a class="waves-effect waves-light btn teal darken-3" href="/listaAnimal"><i class="material-icons left">list</i>Lista de animais</a>
-		</div>
 	</div>
 
 	<script type="text/javascript"
@@ -126,10 +112,10 @@
 	<script
 	src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 	<script type="text/javascript">
-		$(document).ready(function() {
-			$(".button-collapse").sideNav();
-			$('select').material_select();
-		})
+	$(document).ready(function() {
+		$(".button-collapse").sideNav();
+		$('select').material_select();
+	})
 	</script>
 
 </body>

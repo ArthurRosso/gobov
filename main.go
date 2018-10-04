@@ -11,6 +11,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var (
@@ -132,6 +133,8 @@ func checkRegister(w http.ResponseWriter, r *http.Request) {
 	user := User{}
 	username := r.PostFormValue("Username")
 	password := r.PostFormValue("Password")
+	bytes, _ := bcrypt.GenerateFromPassword([]byte(password), 14)
+	password = string(bytes)
 	db.Where("username = ? AND password = ?", username, password).First(&user, User{})
 
 	if user.Username != "" {
@@ -146,9 +149,8 @@ func checkRegister(w http.ResponseWriter, r *http.Request) {
 		db.First(&user)
 
 		ctx := GetContext(w, r)
-		defer ctx.Close()
 		ctx.Session.Values["User.ID"] = user.ID
-
+		ctx.Close()
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
 }
@@ -173,9 +175,9 @@ func auth(w http.ResponseWriter, r *http.Request) {
 	user := User{}
 	username := r.PostFormValue("Username")
 	password := r.PostFormValue("Password")
-	db.Where("username = ? AND password = ?", username, password).First(&user, User{})
+	db.Where("username = ?", username).First(&user, User{})
 
-	if user.Username == "" {
+	if user.ID == 0 || nil != bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) {
 		ctx.AddFlash("Nome de usuário ou senha incorreto")
 		ctx.Close()
 		http.Redirect(w, r, "/login", http.StatusFound)
@@ -206,7 +208,7 @@ func getIndex(w http.ResponseWriter, r *http.Request) {
 	db.Where("user_id = ?", ctx.User.ID).Table("medications").Count(&countMedications)
 
 	histories := []History{}
-	db.Where("user_id = ?", ctx.User.ID).Find(&histories, History{})
+	db.Where("user_id = ?", ctx.User.ID).Order("id desc").Find(&histories, History{})
 
 	context := map[string]interface{}{
 		"histories": histories,
@@ -216,7 +218,7 @@ func getIndex(w http.ResponseWriter, r *http.Request) {
 		"countmed":  countMedications,
 	}
 
-	str, _ := mustache.RenderFile("templates/index.html", context)
+	str, _ := mustache.RenderFileInLayout("templates/navbar.template.html", "templates/index.html", context)
 	bit := []byte(str)
 	w.Write(bit)
 }
@@ -257,7 +259,7 @@ func getAnimal(w http.ResponseWriter, r *http.Request) {
 		"fathers":  fathers,
 	}
 
-	str, _ := mustache.RenderFile("templates/animal.html", context)
+	str, _ := mustache.RenderFileInLayout("templates/navbar.template.html", "templates/animal.html", context)
 	bit := []byte(str)
 	w.Write(bit)
 }
@@ -273,7 +275,7 @@ func getAllAnimals(w http.ResponseWriter, r *http.Request) {
 		"animals": animals,
 	}
 
-	str, _ := mustache.RenderFile("templates/listAnimal.html", context)
+	str, _ := mustache.RenderFileInLayout("templates/navbar.template.html", "templates/listAnimal.html", context)
 	bit := []byte(str)
 	w.Write(bit)
 }
@@ -341,7 +343,7 @@ func postAnimal(w http.ResponseWriter, r *http.Request) {
 	history := History{}
 	history.Description = "Cadastro realizado: " + name
 	history.User = ctx.User
-	history.Animal = &animal
+	history.Animals = []*Animal{&animal}
 	t := time.Now()
 	history.Date = mysql.NullTime{Time: t, Valid: true}
 
@@ -364,7 +366,7 @@ func postAnimal(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	http.Redirect(w, r, "/animal", http.StatusFound)
+	http.Redirect(w, r, "/profile/"+strconv.Itoa(animal.ID), http.StatusFound)
 }
 
 func editAnimal(w http.ResponseWriter, r *http.Request) {
@@ -407,7 +409,7 @@ func editAnimal(w http.ResponseWriter, r *http.Request) {
 		"fathers":  fathers,
 	}
 
-	str, _ := mustache.RenderFile("templates/editAnimal.html", context)
+	str, _ := mustache.RenderFileInLayout("templates/navbar.template.html", "templates/editAnimal.html", context)
 	bit := []byte(str)
 	w.Write(bit)
 }
@@ -490,7 +492,7 @@ func repostAnimal(w http.ResponseWriter, r *http.Request) {
 	history := History{}
 	history.Description = "Animal editado: " + name
 	history.User = ctx.User
-	history.Animal = &animal
+	history.Animals = []*Animal{&animal}
 	t := time.Now()
 	history.Date = mysql.NullTime{Time: t, Valid: true}
 
@@ -527,7 +529,7 @@ func delAnimal(w http.ResponseWriter, r *http.Request) {
 	history := History{}
 	history.Description = "Exclusão realizada: " + animal.Name
 	history.User = ctx.User
-	history.Animal = &animal
+	history.Animals = []*Animal{&animal}
 	t := time.Now()
 	history.Date = mysql.NullTime{Time: t, Valid: true}
 	db.Save(&history)
@@ -579,7 +581,7 @@ func getMedicine(w http.ResponseWriter, r *http.Request) {
 		"medicines": medicines,
 	}
 
-	str, _ := mustache.RenderFile("templates/medicine.html", context)
+	str, _ := mustache.RenderFileInLayout("templates/navbar.template.html", "templates/medicine.html", context)
 	bit := []byte(str)
 	w.Write(bit)
 }
@@ -599,7 +601,7 @@ func editMedicine(w http.ResponseWriter, r *http.Request) {
 		"medicine": medicine,
 	}
 
-	str, _ := mustache.RenderFile("templates/editMedicine.html", context)
+	str, _ := mustache.RenderFileInLayout("templates/navbar.template.html", "templates/editAnimal.html", context)
 	bit := []byte(str)
 	w.Write(bit)
 }
@@ -615,7 +617,7 @@ func getAllMedicines(w http.ResponseWriter, r *http.Request) {
 		"medicines": medicines,
 	}
 
-	str, _ := mustache.RenderFile("templates/listMedicine.html", context)
+	str, _ := mustache.RenderFileInLayout("templates/navbar.template.html", "templates/listMedicine.html", context)
 	bit := []byte(str)
 	w.Write(bit)
 }
@@ -718,7 +720,7 @@ func getMedication(w http.ResponseWriter, r *http.Request) {
 		"medicines": medicines,
 	}
 
-	str, _ := mustache.RenderFile("templates/medication.html", context)
+	str, _ := mustache.RenderFileInLayout("templates/navbar.template.html", "templates/medication.html", context)
 	bit := []byte(str)
 	w.Write(bit)
 }
@@ -733,7 +735,7 @@ func getAllMedications(w http.ResponseWriter, r *http.Request) {
 		"medications": medications,
 	}
 
-	str, _ := mustache.RenderFile("templates/listMedication.html", context)
+	str, _ := mustache.RenderFileInLayout("templates/navbar.template.html", "templates/listMedication.html", context)
 	bit := []byte(str)
 	w.Write(bit)
 }
@@ -751,7 +753,7 @@ func postMedication(w http.ResponseWriter, r *http.Request) {
 		animal := Animal{}
 		id, _ := strconv.Atoi(idAnimals)
 		db.Find(&animal, id)
-		medication.Animals = append(medication.Animals, animal)
+		medication.Animals = append(medication.Animals, &animal)
 	}
 
 	r.ParseForm()
@@ -767,8 +769,10 @@ func postMedication(w http.ResponseWriter, r *http.Request) {
 
 	history := History{}
 	history.Description = "Medicação realizada: " + desc
+	history.Animals = medication.Animals
 	history.User = ctx.User
 	history.Medication = &medication
+
 	t := time.Now()
 	history.Date = mysql.NullTime{Time: t, Valid: true}
 	db.Save(&history)
@@ -811,13 +815,13 @@ func getMedicinePic(w http.ResponseWriter, r *http.Request) {
 }
 
 func getProfile(w http.ResponseWriter, r *http.Request) {
+	ctx := GetContext(w, r)
 	vars := mux.Vars(r)
 	idAnimal, _ := strconv.Atoi(vars["idAnimal"])
 	animal := Animal{ID: idAnimal}
 	db.Preload("Medications").Preload("Weights").Preload("Type").Preload("Breed").Preload("Purposes").Preload("Father").Preload("Mother").Preload("Pictures").First(&animal, idAnimal)
 
-	ctx := GetContext(w, r)
-
+	fmt.Println(animal.ID)
 	if animal.UserID != ctx.User.ID {
 		http.Redirect(w, r, "/", http.StatusFound)
 		return
@@ -828,14 +832,15 @@ func getProfile(w http.ResponseWriter, r *http.Request) {
 	medication := Medication{}
 	db.Model(&animal).Related(&medication, "Medications")
 
-	db.Where("animal_id = ? OR medication_id = ?", animal.ID, medication.ID).Find(&histories, History{})
+	fmt.Println(medication.ID)
+	db.Where("(animal_id = ? OR medication_id = ?)", animal.ID, medication.ID).Order("id desc").Find(&histories, History{})
 
 	context := map[string]interface{}{
 		"histories": histories,
 		"animal":    animal,
 	}
 
-	str, _ := mustache.RenderFile("templates/profile.html", context)
+	str, _ := mustache.RenderFileInLayout("templates/navbar.template.html", "templates/profile.html", context)
 	bit := []byte(str)
 	w.Write(bit)
 }
@@ -854,7 +859,7 @@ func relAnimal(w http.ResponseWriter, r *http.Request) {
 		"animal":  animal,
 	}
 
-	str, _ := mustache.RenderFile("templates/charts.html", context)
+	str, _ := mustache.RenderFileInLayout("templates/navbar.template.html", "templates/charts.html", context)
 	bit := []byte(str)
 	w.Write(bit)
 }
@@ -872,7 +877,7 @@ func getWeight(w http.ResponseWriter, r *http.Request) {
 		"animal":  animal,
 	}
 
-	str, _ := mustache.RenderFile("templates/weight.html", context)
+	str, _ := mustache.RenderFileInLayout("templates/navbar.template.html", "templates/weight.html", context)
 	bit := []byte(str)
 	w.Write(bit)
 }
@@ -898,7 +903,7 @@ func postWeight(w http.ResponseWriter, r *http.Request) {
 	history := History{}
 	history.Description = "Pesagem realizada: " + desc + " do animal " + animal.Name
 	history.User = ctx.User
-	history.Animal = &animal
+	history.Animals = []*Animal{&animal}
 	t := time.Now()
 	history.Date = mysql.NullTime{Time: t, Valid: true}
 	db.Save(&history)
@@ -923,7 +928,7 @@ func delWeight(w http.ResponseWriter, r *http.Request) {
 	db.First(&animal, weight.AnimalID)
 	history.Description = "Exclusão de pesagem realizada: " + weight.Description + " do animal " + animal.Name
 	history.User = ctx.User
-	history.Animal = &animal
+	history.Animals = []*Animal{&animal}
 	t := time.Now()
 	history.Date = mysql.NullTime{Time: t, Valid: true}
 	db.Save(&history)
