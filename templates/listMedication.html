@@ -23,25 +23,7 @@
 
 	<header>
 
-		<nav class="teal darken-4">
-			<div class="nav-wrapper">
-				<a href="/" class="brand-logo">GoBov</a> <a href="/"
-				data-activates="mobile-demo" class="button-collapse"><i
-				class="material-icons">menu</i></a>
-				<ul class="right hide-on-med-and-down">
-					<li><a href="/animal">Animal</a></li>
-					<li><a href="/medicine">Remédio</a></li>
-					<li><a href="/medication">Medicação</a></li>
-					<li><a href="/logout">Sair</a></li>
-				</ul>
-				<ul class="side-nav" id="mobile-demo">
-					<li><a href="/animal">Animal</a></li>
-					<li><a href="/medicine">Remédio</a></li>
-					<li><a href="/medication">Medicação</a></li>
-					<li><a href="/logout">Sair</a></li>
-				</ul>
-			</div>
-		</nav>
+		{{{content}}}
 
 	</header>
 
@@ -78,6 +60,10 @@
 			</tbody>
 		</table>
 
+		<div class="fixed-action-btn">
+			<a href="/medication" class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">add</i></a>
+		</div>
+
 	</div>
 
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
@@ -86,7 +72,7 @@
 		$(document).ready(function() {
 			$(".button-collapse").sideNav();
 		})
-		
+
 		  function myFunction() {
 		    var input, filter, table, tr, td, i;
 		    input = document.getElementById("search");
@@ -103,7 +89,7 @@
 			} else {
 			  tr[i].style.display = "none";
 			}
-		      }       
+		      }
 		    }
 		  }
 	</script>

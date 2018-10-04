@@ -9,7 +9,7 @@ type Medication struct {
 	ID          int
 	Description string
 	Date        time.Time
-	Animals     []Animal   `gorm:"many2many:medication_animal"`
+	Animals     []*Animal  `gorm:"many2many:medication_animal"`
 	Medicines   []Medicine `gorm:"many2many:medication_medicine"`
 	User        *User
 

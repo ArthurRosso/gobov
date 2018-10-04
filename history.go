@@ -7,7 +7,7 @@ type History struct {
 	Description string
 	Date        time.Time
 	User        *User
-	Animal      *Animal
+	Animals     []*Animal `gorm:"many2many:animal_history"`
 	Medication  *Medication
 
 	UserID       int

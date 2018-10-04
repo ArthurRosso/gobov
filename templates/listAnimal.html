@@ -17,31 +17,12 @@
 
 	<header>
 
-		<nav class="teal darken-4">
-			<div class="nav-wrapper">
-				<a href="/" class="brand-logo">GoBov</a> <a href="/"
-				data-activates="mobile-demo" class="button-collapse"><i
-				class="material-icons">menu</i></a>
-				<ul class="right hide-on-med-and-down">
-					<li><a href="/animal">Animal</a></li>
-					<li><a href="/medicine">Remédio</a></li>
-					<li><a href="/medication">Medicação</a></li>
-					<li><a href="/logout">Sair</a></li>
-				</ul>
-				<ul class="side-nav" id="mobile-demo">
-					<li><a href="/animal">Animal</a></li>
-					<li><a href="/medicine">Remédio</a></li>
-					<li><a href="/Medication">Medicação</a></li>
-					<li><a href="/logout">Sair</a></li>
-				</ul>
-			</div>
-		</nav>
+		{{{content}}}
 
 	</header>
 
 	<div class="row container">
 
-		<!-- TODO: Fazer a pesquisa -->
 		<form>
 			<div class="input-field">
 				<i class="material-icons prefix">search</i>
@@ -78,6 +59,10 @@
         </tbody>
       </table>
 
+			<div class="fixed-action-btn">
+				<a href="/animal" class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">add</i></a>
+		  </div>
+
 	</div>
 
 	<script type="text/javascript"
@@ -88,7 +73,7 @@
 		$(document).ready(function() {
 			$(".button-collapse").sideNav();
 		})
-		
+
 	  function myFunction() {
 	    var input, filter, table, tr, td, i;
 	    input = document.getElementById("search");
@@ -106,7 +91,7 @@
 			} else {
 		  		tr[i].style.display = "none";
 			}
-	      }       
+	      }
 	    }
 	  }
 	</script>
