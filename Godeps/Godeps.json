@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/ArthurRosso/gobov",
-	"GoVersion": "go1.10",
+	"GoVersion": "go1.11",
 	"GodepVersion": "v80",
 	"Deps": [
 		{
@@ -41,6 +41,14 @@
 		{
 			"ImportPath": "github.com/jinzhu/inflection",
 			"Rev": "04140366298a54a039076d798123ffa108fff46c"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/bcrypt",
+			"Rev": "614d502a4dac94afa3a6ce146bd1736da82514c6"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/blowfish",
+			"Rev": "614d502a4dac94afa3a6ce146bd1736da82514c6"
 		}
 	]
 }
