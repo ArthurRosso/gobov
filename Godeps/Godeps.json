@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/ArthurRosso/gobov",
-	"GoVersion": "go1.10",
+	"GoVersion": "go1.11",
 	"GodepVersion": "v80",
 	"Deps": [
 		{
@@ -43,14 +43,12 @@
 			"Rev": "04140366298a54a039076d798123ffa108fff46c"
 		},
 		{
-			"ImportPath": "github.com/lib/pq",
-			"Comment": "v1.0.0",
-			"Rev": "4ded0e9383f75c197b3a2aaa6d590ac52df6fd79"
+			"ImportPath": "golang.org/x/crypto/bcrypt",
+			"Rev": "614d502a4dac94afa3a6ce146bd1736da82514c6"
 		},
 		{
-			"ImportPath": "github.com/lib/pq/oid",
-			"Comment": "v1.0.0",
-			"Rev": "4ded0e9383f75c197b3a2aaa6d590ac52df6fd79"
+			"ImportPath": "golang.org/x/crypto/blowfish",
+			"Rev": "614d502a4dac94afa3a6ce146bd1736da82514c6"
 		}
 	]
 }
