@@ -11,6 +11,7 @@ import (
 	"github.com/cbroglie/mustache"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
+	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 )
 
