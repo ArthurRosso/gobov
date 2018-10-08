@@ -31,7 +31,7 @@
 		<div class="col s12 m4 l3"> <!-- Note that "m4 l3" was added -->
 			{{#animal}}
 			<div class="fixed-action-btn">
-				<a class="btn-floating btn-large teal darken-4">
+				<a class="btn-floating btn-large">
 					<i class="large material-icons">mode_edit</i>
 				</a>
 				<ul>
@@ -57,6 +57,7 @@
 				<div class="card-panel">
 					<div>
 						<span>Nascimento: {{animal.BirthFmt}}</span><br>
+						<span>Idade: {{animal.Age}} meses</span><br>
 						<span>Peso: {{animal.WeightFmt}}kg</span><br>
 						<span>Tipo: {{animal.Type.Type}}</span><br>
 						<span>Raça: {{animal.Breed.Breed}}</span><br>
