@@ -341,7 +341,7 @@ func postAnimal(w http.ResponseWriter, r *http.Request) {
 	animal.User = ctx.User
 
 	history := History{}
-	history.Description = "Cadastro realizado: " + name
+	history.Description = "Cadastro de animal realizado: " + name
 	history.User = ctx.User
 	history.Animals = []*Animal{&animal}
 	history.Date = time.Now()
@@ -648,7 +648,7 @@ func postMedicine(w http.ResponseWriter, r *http.Request) {
 	medicine.User = ctx.User
 
 	history := History{}
-	history.Description = "Cadastro realizado: " + name
+	history.Description = "Cadastro de remédio realizado: " + name
 	history.User = ctx.User
 	history.Date = time.Now()
 	db.Save(&history)
@@ -814,19 +814,13 @@ func getProfile(w http.ResponseWriter, r *http.Request) {
 	animal := Animal{ID: idAnimal}
 	db.Preload("Medications").Preload("Weights").Preload("Type").Preload("Breed").Preload("Purposes").Preload("Father").Preload("Mother").Preload("Pictures").First(&animal, idAnimal)
 
-	fmt.Println(animal.ID)
 	if animal.UserID != ctx.User.ID {
 		http.Redirect(w, r, "/", http.StatusFound)
 		return
 	}
 
 	histories := []History{}
-
-	medication := Medication{}
-	db.Model(&animal).Related(&medication, "Medications")
-
-	fmt.Println(medication.ID)
-	db.Where("(animal_id = ? OR medication_id = ?)", animal.ID, medication.ID).Order("id desc").Find(&histories, History{})
+	db.Model(&animal).Order("id desc").Related(&histories, "Histories")
 
 	context := map[string]interface{}{
 		"histories": histories,

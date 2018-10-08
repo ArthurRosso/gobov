@@ -31,67 +31,66 @@
 			</div>
 		</form>
 
-	<table id="myTable" class="highlight responsive-table">
-        <thead>
-          <tr>
-							<th></th>
-              <th>Nome</th>
-              <th>Descrição</th>
-              <th>Validade</th>
-              <th>Tipo</th>
-              <th></th>
-			  <th></th>
-          </tr>
-        </thead>
+		<table id="myTable" class="highlight responsive-table">
+			<thead>
+				<tr>
+					<th></th>
+					<th>Nome</th>
+					<th>Descrição</th>
+					<th>Validade</th>
+					<th>Tipo</th>
+					<th></th>
+					<th></th>
+				</tr>
+			</thead>
 
-        <tbody>
-	{{#medicines}}
-          <tr>
-						<td><div style="width: 30%;"><img class="responsive-img" src="/picMedicine/{{ID}}"></div></td>
-            <td>{{Name}}</td>
-            <td>{{Description}}</td>
-            <td>{{ExpirationFmt}}</td>
-            <td>{{Type.Type}}</td>
-            <td><a href="/editMedicine/{{ID}}"><i class="material-icons left">edit</i></a></a></td>
-            <td><a href="/delMedicine/{{ID}}"><i class="material-icons left">delete</i></a></a></td>
-          </tr>
-	{{/medicines}}
-        </tbody>
-      </table>
-			<div class="fixed-action-btn">
-				<a href="/medicine" class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">add</i></a>
-		  </div>
-</div>
+			<tbody>
+				{{#medicines}}
+				<tr>
+					<td><div style="width: 30%;"><img class="responsive-img" src="/picMedicine/{{ID}}"></div></td>
+					<td>{{Name}}</td>
+					<td>{{Description}}</td>
+					<td>{{ExpirationFmt}}</td>
+					<td>{{Type.Type}}</td>
+					<td><a href="/editMedicine/{{ID}}"><i class="material-icons left">edit</i></a></a></td>
+					<td><a href="/delMedicine/{{ID}}"><i class="material-icons left">delete</i></a></a></td>
+				</tr>
+				{{/medicines}}
+			</tbody>
+		</table>
+		<div class="fixed-action-btn">
+			<a href="/medicine" class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">add</i></a>
+		</div>
+	</div>
 
-<script type="text/javascript"
-src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-<script
-src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
-<script type="text/javascript">
+	<script type="text/javascript"
+	src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script 	src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+	<script type="text/javascript">
 	$(document).ready(function() {
 		$(".button-collapse").sideNav();
-		$('select').material_select();
 	})
 
-  function myFunction() {
-    var input, filter, table, tr, td, i;
-    input = document.getElementById("search");
-    filter = input.value.toUpperCase();
-    table = document.getElementById("myTable");
-    tr = table.getElementsByTagName("tr");
-    for (i = 0; i < tr.length; i++) {
-      nome = tr[i].getElementsByTagName("td")[0];
-      desc = tr[i].getElementsByTagName("td")[1];
-      tipo = tr[i].getElementsByTagName("td")[3];
-      if (nome || desc || tipo) {
-        if (nome.innerHTML.toUpperCase().indexOf(filter) > -1 || desc.innerHTML.toUpperCase().indexOf(filter) > -1 || tipo.innerHTML.toUpperCase().indexOf(filter) > -1) {
-          tr[i].style.display = "";
-        } else {
-          tr[i].style.display = "none";
-        }
-      }
-    }
-  }
+	function myFunction() {
+		var input, filter, table, tr, td, i;
+		input = document.getElementById("search");
+		filter = input.value.toUpperCase();
+		table = document.getElementById("myTable");
+		tr = table.getElementsByTagName("tr");
+		for (i = 0; i < tr.length; i++) {
+			nome = tr[i].getElementsByTagName("td")[1];
+			desc = tr[i].getElementsByTagName("td")[2];
+			vali = tr[i].getElementsByTagName("td")[3];
+			tipo = tr[i].getElementsByTagName("td")[4];
+			if (nome || desc || vali || tipo) {
+				if (nome.innerHTML.toUpperCase().indexOf(filter) > -1 || desc.innerHTML.toUpperCase().indexOf(filter) > -1 || tipo.innerHTML.toUpperCase().indexOf(filter) > -1 || tipo.innerHTML.toUpperCase().indexOf(filter) > -1 || vali.innerHTML.toUpperCase().indexOf(filter) > -1) {
+					tr[i].style.display = "";
+				} else {
+					tr[i].style.display = "none";
+				}
+			}
+		}
+	}
 </script>
 
 </body>

@@ -17,52 +17,56 @@
 
 	<header>
 
-	{{{content}}}
+		{{{content}}}
 
 	</header>
+	<div class="container">
 
-			<div class="col s3">
+		<div class="col s3">
 
-				<div class="row">
-					<div>
-						<div class="card-panel">
-							<h4>Informações da fazenda</h4><br>
-							<span>Fazandeiro: {{user.Username}}</span><br>
-							<span>Total Animais: {{counta}}</span><br>
-							<span>Total Remédios: {{countm}}</span><br>
-							<span>Total Medicações: {{countmed}}</span><br>
-						</div>
+			<div class="row">
+				<div>
+					<div class="card-panel">
+						<h4>Informações da fazenda</h4><br>
+						<span>Fazandeiro: {{user.Username}}</span><br>
+						<span>Total Animais: {{counta}}</span><br>
+						<span>Total Remédios: {{countm}}</span><br>
+						<span>Total Medicações: {{countmed}}</span><br>
 					</div>
-
 				</div>
 
 			</div>
 
+		</div>
+
+		<div class="section">
 			<h5>Histórico de ações:</h5>
+			<div class="divider"></div>
 			{{#histories}}
 			<div class="col s9 m7">
-    			<div class="card horizontal">
-      			<div class="card-stacked">
-        			<div class="card-content">
-          			<p>{{Description}}</p>
-        			</div>
-      			</div>
-    			</div>
-  		</div>
+				<div class="card horizontal">
+					<div class="card-stacked">
+						<div class="card-content">
+							<p>{{Description}}</p>
+						</div>
+					</div>
+				</div>
+			</div>
 			{{/histories}}
+		</div>
 
 
-			<script type="text/javascript"
-	   src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-			<script
-    src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+		<script type="text/javascript"
+		src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+		<script
+		src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 
-			<script type="text/javascript">
-				$(document).ready(function() {
-					$(".button-collapse").sideNav();
-				})
-			</script>
+		<script type="text/javascript">
+		$(document).ready(function() {
+			$(".button-collapse").sideNav();
+		})
+		</script>
 	</body>
-
+</div>
 
 </html>
