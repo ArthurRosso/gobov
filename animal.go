@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"time"
 )
 
@@ -68,10 +69,22 @@ func (a Animal) MainPic() Picture {
 }
 
 func (a Animal) Age() int {
-	now := time.Now()
-	years := now.Year() - a.Birthday.Year()
-	if now.YearDay() < a.Birthday.YearDay() {
-		years--
+	b := a.Birthday
+	x := RoundTime(b.Sub(time.Now()).Seconds() / 2600640)
+	return x * (-1)
+}
+
+func RoundTime(input float64) int {
+	var result float64
+
+	if input < 0 {
+		result = math.Ceil(input - 0.5)
+	} else {
+		result = math.Floor(input + 0.5)
 	}
-	return years
+
+	// only interested in integer, ignore fractional
+	i, _ := math.Modf(result)
+
+	return int(i)
 }
