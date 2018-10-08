@@ -11,13 +11,6 @@
 
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css" />
 
-	<style type="text/css">
-	ol {
-		list-style-type: disc;
-	}
-</style>
-
-
 </head>
 <body>
 
@@ -69,29 +62,30 @@
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 	<script type="text/javascript">
-		$(document).ready(function() {
-			$(".button-collapse").sideNav();
-		})
+	$(document).ready(function() {
+		$(".button-collapse").sideNav();
+	})
 
-		  function myFunction() {
-		    var input, filter, table, tr, td, i;
-		    input = document.getElementById("search");
-		    filter = input.value.toUpperCase();
-		    table = document.getElementById("myTable");
-		    tr = table.getElementsByTagName("tr");
-		    for (i = 0; i < tr.length; i++) {
-		      desc = tr[i].getElementsByTagName("td")[0];
-		      a = tr[i].getElementsByTagName("td")[2];
-		      m = tr[i].getElementsByTagName("td")[3];
-		      if (td) {
-			if (desc.innerHTML.toUpperCase().indexOf(filter) > -1 || a.innerHTML.toUpperCase().indexOf(filter) > -1  || m.innerHTML.toUpperCase().indexOf(filter) > -1) {
-			  tr[i].style.display = "";
-			} else {
-			  tr[i].style.display = "none";
+	function myFunction() {
+		var input, filter, table, tr, td, i;
+		input = document.getElementById("search");
+		filter = input.value.toUpperCase();
+		table = document.getElementById("myTable");
+		tr = table.getElementsByTagName("tr");
+		for (i = 0; i < tr.length; i++) {
+			desc = tr[i].getElementsByTagName("td")[0];
+			data = tr[i].getElementsByTagName("td")[1];
+			a = tr[i].getElementsByTagName("td")[2];
+			m = tr[i].getElementsByTagName("td")[3];
+			if (desc || data || a || m) {
+				if (desc.innerHTML.toUpperCase().indexOf(filter) > -1 || data.innerHTML.toUpperCase().indexOf(filter) > -1 || a.innerHTML.toUpperCase().indexOf(filter) > -1 || m.innerHTML.toUpperCase().indexOf(filter) > -1) {
+					tr[i].style.display = "";
+				} else {
+					tr[i].style.display = "none";
+				}
 			}
-		      }
-		    }
-		  }
+		}
+	}
 	</script>
 
 </body>

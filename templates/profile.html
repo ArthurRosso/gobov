@@ -95,17 +95,21 @@
 
 				</div>
 
-				{{#histories}}
-				<div class="col s12 m7">
-	    			<div class="card horizontal">
-	      			<div class="card-stacked">
-	        			<div class="card-content">
-	          			<p>{{Description}}</p>
-	        			</div>
-	      			</div>
-	    			</div>
-	  		</div>
-				{{/histories}}
+				<div class="section">
+					<h5>Histórico de ações:</h5>
+					<div class="divider"></div>
+					{{#histories}}
+					<div class="col s9">
+						<div class="card horizontal">
+							<div class="card-stacked">
+								<div class="card-content">
+									<p>{{Description}}</p>
+								</div>
+							</div>
+						</div>
+					</div>
+					{{/histories}}
+				</div>
 
 
 				<script type="text/javascript"
