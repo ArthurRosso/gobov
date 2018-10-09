@@ -30,7 +30,7 @@
 							Nome: <input type="text" name="Name" class="validate" required="" aria-required="true" />
 						</div>
 						<div class="input-field col s6">
-							Validade: <input type="date" name="Expiration" class="validate" required="" aria-required="true" />
+							Validade: <input id="expiration" type="date" name="Expiration" class="validate" required="" aria-required="true" />
 						</div>
 						<div class="input-field col s6">
 							Descrição: <input type="text" name="Description" />
@@ -47,10 +47,10 @@
 							<div class="file-field input-field">
 								<div class="btn teal darken-3">
 									<span>Foto <small>(opcional)</small></span>
-									<input name="Picture" type="file" >
+									<input name="Picture" type="file" accept="image/png, image/jpeg" >
 								</div>
 								<div class="file-path-wrapper">
-									<input class="file-path validate" name="Picture" type="text" placeholder="Adicione uma foto.">
+									<input accept="image/png, image/jpeg" class="file-path validate" name="Picture" type="text" placeholder="Adicione uma foto.">
 								</div>
 							</div>
 						</div>
@@ -74,6 +74,20 @@ src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.m
 $(document).ready(function() {
 	$(".button-collapse").sideNav();
 	$('select').material_select();
+
+	var dtToday = new Date();
+
+	var month = dtToday.getMonth() + 1;
+	var day = dtToday.getDate();
+	var year = dtToday.getFullYear();
+
+	if(month < 10)
+	month = '0' + month.toString();
+	if(day < 10)
+	day = '0' + day.toString();
+
+	var maxDate = year + '-' + month + '-' + day;
+	$('#expiration').attr('min', maxDate);
 })
 </script>
 
