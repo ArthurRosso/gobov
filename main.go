@@ -93,6 +93,7 @@ func main() {
 
 	logado.HandleFunc("/medication", getMedication)
 	logado.HandleFunc("/newMedication", postMedication)
+	logado.HandleFunc("/delMedication/{ID}", delMedication)
 	logado.HandleFunc("/listaMedication", getAllMedications)
 
 	r.HandleFunc("/register", register)
@@ -523,7 +524,7 @@ func repostAnimal(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	http.Redirect(w, r, "/animal", http.StatusFound)
+	http.Redirect(w, r, "/listaAnimal", http.StatusFound)
 }
 
 func delAnimal(w http.ResponseWriter, r *http.Request) {
@@ -535,7 +536,7 @@ func delAnimal(w http.ResponseWriter, r *http.Request) {
 	db.Find(&animal, &Animal{})
 
 	history := History{}
-	history.Description = "Exclusão realizada: " + animal.Name
+	history.Description = "Exclusão realizada do animal: " + animal.Name
 	history.User = ctx.User
 	history.Animals = []*Animal{&animal}
 	t := time.Now()
@@ -563,7 +564,7 @@ func delMedicine(w http.ResponseWriter, r *http.Request) {
 	ctx := GetContext(w, r)
 
 	history := History{}
-	history.Description = "Exclusão realizada: " + medicine.Name
+	history.Description = "Exclusão realizada do remédio: " + medicine.Name
 	history.User = ctx.User
 	t := time.Now()
 	history.Date = mysql.NullTime{Time: t, Valid: true}
@@ -667,7 +668,7 @@ func postMedicine(w http.ResponseWriter, r *http.Request) {
 
 	db.Save(&medicine)
 
-	http.Redirect(w, r, "/medicine", http.StatusFound)
+	http.Redirect(w, r, "/listaMedicine", http.StatusFound)
 }
 
 func repostMedicine(w http.ResponseWriter, r *http.Request) {
@@ -709,7 +710,7 @@ func repostMedicine(w http.ResponseWriter, r *http.Request) {
 
 	db.Save(&medicine)
 
-	http.Redirect(w, r, "/medicine", http.StatusFound)
+	http.Redirect(w, r, "/listaMedicine", http.StatusFound)
 }
 
 func getMedication(w http.ResponseWriter, r *http.Request) {
@@ -786,7 +787,33 @@ func postMedication(w http.ResponseWriter, r *http.Request) {
 
 	db.Save(&medication)
 
-	http.Redirect(w, r, "/medication", http.StatusFound)
+	http.Redirect(w, r, "/listaMedication", http.StatusFound)
+}
+
+func delMedication(w http.ResponseWriter, r *http.Request) {
+	ctx := GetContext(w, r)
+
+	m := mux.Vars(r)
+	id, _ := strconv.Atoi(m["ID"])
+	medication := Medication{ID: id}
+	db.Find(&medication, &Medication{})
+
+	history := History{}
+	history.Description = "Exclusão de medicação realizada: " + medication.Description
+	history.User = ctx.User
+	history.Animals = medication.Animals
+	t := time.Now()
+	history.Date = mysql.NullTime{Time: t, Valid: true}
+	db.Save(&history)
+
+	db.Preload("Animals").Preload("Medicines").First(&medication)
+
+	db.Exec("DELETE FROM medication_animal WHERE medication_id=?", id)
+	db.Exec("DELETE FROM medication_medicine WHERE medication_id=?", id)
+
+	db.Delete(&medication)
+
+	http.Redirect(w, r, "/listaMedication", http.StatusFound)
 }
 
 func getPic(w http.ResponseWriter, r *http.Request) {

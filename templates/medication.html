@@ -22,13 +22,13 @@
 
 	<div class="container">
 		<div class="card-panel">
-			<form method="post" action="/newMedication" enctype="multipart/form-data" >
-				Descrição: <input type="text" name="Description" />
-				Data: <input id="date" type="date" name="Date" />
+			<form method="post" action="/newMedication" enctype="multipart/form-data" id="formCheck" >
+				Descrição: <input type="text" name="Description"  />
+				Data: <input id="date" type="date" name="Date" class="validate" required="" aria-required="true" />
 				<div>
 					Animais:
 					{{ #animals }}
-					<p>
+					<p id="inputsAnimal">
 						<input type="checkbox" id="{{ID}}" name="Animal" value="{{ID}}" />
 						<label for="{{ID}}">{{Name}}</label>
 					</p>
@@ -38,15 +38,15 @@
 				<div>
 					Remédio:
 					{{ #medicines }}
-					<p>
+					<p id="inputsMed">
 						<input type="checkbox" id="medicine-{{ID}}" name="Medicine" value="{{ID}}" />
 						<label for="medicine-{{ID}}">{{Name}}</label>
 					</p>
 					{{ /medicines }}
 				</div>
 				<div class="right-align">
-					<button class="btn waves-effect waves-light teal darken-3"
-					type="submit" name="action">
+					<button class="btn waves-effect waves-light teal darken-3" id="submit"
+					type="submit" onclick="Check(document.getElementById('formCheck')); " name="action">
 					Salvar <i class="material-icons right">save</i>
 				</button>
 			</div>
@@ -60,7 +60,19 @@
 $(document).ready(function() {
 	$(".button-collapse").sideNav();
 	$('select').material_select();
-})
+});
+
+$('#submit').click(function(e){
+	var checked = $("#inputsAnimal input:checked").length;
+	var checked2 = $("#inputsMed input:checked").length;
+	if(checked == 0 || checked2 == 0) {
+		event.preventDefault(e);
+		Materialize.toast("Você deve selecionar pelo menos um animal e remédio.");
+		return false;
+	}
+
+
+});
 </script>
 
 </body>
