@@ -28,14 +28,14 @@
 						<form class="col s12" action="/auth" method="post">
 							<div class="row">
 								<div class="input-field col s12">
-									<input id="username" name="Username" type="text" class="validate" required="" aria-required="true" minlength="3" >
-									<label for="username" data-error="Mínimo 3 caracteres" data-success="Isso aí">Nome de usuário</label>
+									<input id="username" name="Username" type="text">
+									<label for="username">Nome de usuário</label>
 								</div>
 							</div>
 							<div class="row">
 								<div class="input-field col s12">
-									<input id="password" name="Password" type="password" class="validate" required="" aria-required="true" minlength="6">
-									<label for="password" data-error="Mínimo 6 caracteres" data-success="Isso aí">Senha</label>
+									<input id="password" name="Password" type="password" >
+									<label for="password">Senha</label>
 								</div>
 								<center><p>
 									Novo por aqui? <a href="/register">Registre-se</a> hoje!
@@ -56,8 +56,10 @@
 			<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.min.js"></script>
 			<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/additional-methods.min.js"></script>
 			<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
-			<script>
-			// if({{err}} != null) Materialize.toast({{err}}, 4000);
+			<script type="text/javascript">
+			{{ #err }}
+			Materialize.toast("{{.}}");
+			{{ /err }}
 			</script>
 		</body>
 		</html>

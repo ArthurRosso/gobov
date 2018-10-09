@@ -180,7 +180,7 @@ func auth(w http.ResponseWriter, r *http.Request) {
 	db.Where("username = ?", username).First(&user, User{})
 
 	if user.ID == 0 || nil != bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) {
-		ctx.AddFlash("Nome de usuário ou senha incorreto")
+		ctx.AddFlash("Nome de usuário ou senha incorreto(s)")
 		ctx.Close()
 		http.Redirect(w, r, "/login", http.StatusFound)
 	} else {
