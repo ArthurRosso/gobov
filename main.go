@@ -351,6 +351,14 @@ func postAnimal(w http.ResponseWriter, r *http.Request) {
 
 	db.Save(&animal)
 
+	if files == nil {
+		pic := Picture{Main: true, AnimalID: animal.ID}
+		f, _ := ioutil.ReadFile("static/cow-and-moon.jpg")
+		fmt.Println("Contents of file:", string(f))
+		pic.Picture = f
+		db.Save(&pic)
+	}
+
 	if len(files) > 0 {
 		pic := Picture{Main: true, AnimalID: animal.ID}
 		arquivo, _ := files[0].Open()
@@ -543,7 +551,7 @@ func delAnimal(w http.ResponseWriter, r *http.Request) {
 	db.Where("animal_id = ?", id).Delete(&Picture{})
 	db.Delete(&animal)
 
-	http.Redirect(w, r, "/animal", http.StatusFound)
+	http.Redirect(w, r, "/listaAnimal", http.StatusFound)
 }
 
 func delMedicine(w http.ResponseWriter, r *http.Request) {
@@ -564,7 +572,7 @@ func delMedicine(w http.ResponseWriter, r *http.Request) {
 	db.Exec("DELETE FROM medication_medicine WHERE medicine_id=?", id)
 	db.Where("ID = ?", id).Delete(&Medicine{})
 
-	http.Redirect(w, r, "/medicine", http.StatusFound)
+	http.Redirect(w, r, "/listaMedicine", http.StatusFound)
 }
 
 func getMedicine(w http.ResponseWriter, r *http.Request) {
@@ -601,7 +609,7 @@ func editMedicine(w http.ResponseWriter, r *http.Request) {
 		"medicine": medicine,
 	}
 
-	str, _ := mustache.RenderFileInLayout("templates/navbar.template.html", "templates/editAnimal.html", context)
+	str, _ := mustache.RenderFileInLayout("templates/navbar.template.html", "templates/editMedicine.html", context)
 	bit := []byte(str)
 	w.Write(bit)
 }
@@ -640,13 +648,12 @@ func postMedicine(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseMultipartForm(0)
 	f := r.MultipartForm
-	if f == nil {
-		fmt.Println("Erro no formulário")
+	if f != nil {
+		file := f.File["Picture"]
+		arquivo, _ := file[0].Open()
+		medicine.Picture, _ = ioutil.ReadAll(arquivo)
+		arquivo.Close()
 	}
-	file := f.File["Picture"]
-	arquivo, _ := file[0].Open()
-	medicine.Picture, _ = ioutil.ReadAll(arquivo)
-	defer arquivo.Close()
 
 	ctx := GetContext(w, r)
 	medicine.User = ctx.User
@@ -783,16 +790,11 @@ func postMedication(w http.ResponseWriter, r *http.Request) {
 }
 
 func getPic(w http.ResponseWriter, r *http.Request) {
-	ctx := GetContext(w, r)
 	vars := mux.Vars(r)
 	idAnimal, _ := strconv.Atoi(vars["idAnimal"])
 	picture := Picture{}
 	animal := Animal{}
 	db.First(&animal, idAnimal)
-	if animal.UserID != ctx.User.ID {
-		http.Redirect(w, r, "/", http.StatusFound)
-		return
-	}
 	db.First(&picture, idAnimal)
 	if len(picture.Picture) > 0 {
 		w.Write(picture.Picture)
