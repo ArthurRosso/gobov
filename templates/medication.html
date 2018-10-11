@@ -67,11 +67,9 @@ $('#submit').click(function(e){
 	var checked2 = $("#inputsMed input:checked").length;
 	if(checked == 0 || checked2 == 0) {
 		event.preventDefault(e);
-		Materialize.toast("Você deve selecionar pelo menos um animal e remédio.");
+		Materialize.toast("Você deve selecionar pelo menos um animal e remédio.", 3000);
 		return false;
 	}
-
-
 });
 </script>
 
