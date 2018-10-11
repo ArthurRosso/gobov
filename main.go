@@ -354,7 +354,6 @@ func postAnimal(w http.ResponseWriter, r *http.Request) {
 	if files == nil {
 		pic := Picture{Main: true, AnimalID: animal.ID}
 		f, _ := ioutil.ReadFile("static/cow-and-moon.jpg")
-		fmt.Println("Contents of file:", string(f))
 		pic.Picture = f
 		db.Save(&pic)
 	}
@@ -642,15 +641,6 @@ func postMedicine(w http.ResponseWriter, r *http.Request) {
 	medicine.Type = &typeM
 	db.First(&medicine.Type, idType)
 
-	r.ParseMultipartForm(0)
-	f := r.MultipartForm
-	if f != nil {
-		file := f.File["Picture"]
-		arquivo, _ := file[0].Open()
-		medicine.Picture, _ = ioutil.ReadAll(arquivo)
-		arquivo.Close()
-	}
-
 	ctx := GetContext(w, r)
 	medicine.User = ctx.User
 
@@ -660,6 +650,14 @@ func postMedicine(w http.ResponseWriter, r *http.Request) {
 	history.Date = time.Now()
 	db.Save(&history)
 
+	r.ParseMultipartForm(0)
+	f := r.MultipartForm
+	file := f.File["Picture"]
+	if file != nil {
+		arquivo, _ := file[0].Open()
+		medicine.Picture, _ = ioutil.ReadAll(arquivo)
+		arquivo.Close()
+	}
 	db.Save(&medicine)
 
 	http.Redirect(w, r, "/listaMedicine", http.StatusFound)

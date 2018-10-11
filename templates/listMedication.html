@@ -44,12 +44,12 @@
 
 			<tbody>
 				{{ #medications }}
-				<tr>
+				<tr id="medication-{{ID}}">
 					<td>{{Description}}</td>
 					<td>{{DateFmt}}</td>
 					<td>{{AnimalsFmt}}</td>
 					<td>{{MedicinesFmt}}</td>
-					<td><a href="/delMedication/{{ID}}"><i class="material-icons left">delete</i></a></a></td>
+					<td><a onclick="DelClick({{ID}})" class="waves-effect waves-light btn-small"><i class="material-icons left">delete</i></a></a></td>
 				</tr>
 				{{ /medications }}
 			</tbody>
@@ -63,10 +63,36 @@
 
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.28.4/dist/sweetalert2.all.min.js"></script>
 	<script type="text/javascript">
+
 	$(document).ready(function() {
 		$(".button-collapse").sideNav();
 	})
+
+	function DelClick(id){
+		swal({
+			title: 'Are you sure?',
+			text: "You won't be able to revert this!",
+			type: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#3085d6',
+			cancelButtonColor: '#d33',
+			confirmButtonText: 'Yes, delete it!'
+		}).then((result) => {
+			if (result.value) {
+				swal(
+					'Deleted!',
+					'Your file has been deleted.',
+					'success'
+				)
+				$.get('/delMedication/'+id, function(){
+					$('#medication-'+id).remove();
+				});
+			}
+		})
+		return false;
+	}
 
 	function myFunction() {
 		var input, filter, table, tr, td, i;

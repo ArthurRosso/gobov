@@ -31,69 +31,92 @@
 			</div>
 		</form>
 
-	<table id="myTable" class="highlight responsive-table">
-        <thead>
-          <tr>
-              <th>Identificador</th>
-              <th>Nascimento</th>
-              <th>Peso</th>
-              <th>Tipo</th>
-              <th>Raça</th>
-              <th>Propósito(s)</th>
-							<th></th>
-          </tr>
-        </thead>
+		<table id="myTable" class="highlight responsive-table">
+			<thead>
+				<tr>
+					<th>Identificador</th>
+					<th>Nascimento</th>
+					<th>Peso</th>
+					<th>Tipo</th>
+					<th>Raça</th>
+					<th>Propósito(s)</th>
+					<th></th>
+				</tr>
+			</thead>
 
-        <tbody>
-					{{#animals}}
-          <tr>
-            <td><a href="profile/{{ID}}">{{Name}}</a></td>
-            <td>{{BirthFmt}}</td>
-            <td>{{WeightFmt}}kg</td>
-            <td>{{Type.Type}}</td>
-            <td>{{Breed.Breed}}</td>
-            <td>{{PurposesFmt}}</td>
-	    <td><a href="/delAnimal/{{ID}}"><i class="material-icons left">delete</i></a></a></td>
-          </tr>
-					{{/animals}}
-        </tbody>
-      </table>
+			<tbody>
+				{{#animals}}
+				<tr id="animal-{{ID}}">
+					<td><a href="profile/{{ID}}">{{Name}}</a></td>
+					<td>{{BirthFmt}}</td>
+					<td>{{WeightFmt}}kg</td>
+					<td>{{Type.Type}}</td>
+					<td>{{Breed.Breed}}</td>
+					<td>{{PurposesFmt}}</td>
+					<td><a onclick="DelClick({{ID}})" class="waves-effect waves-light btn-small"><i class="material-icons left">delete</i></a></a></td>
+				</tr>
+				{{/animals}}
+			</tbody>
+		</table>
 
-			<div class="fixed-action-btn">
-				<a href="/animal" class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">add</i></a>
-		  </div>
+		<div class="fixed-action-btn">
+			<a href="/animal" class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">add</i></a>
+		</div>
 
 	</div>
 
-	<script type="text/javascript"
-	src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-	<script
-	src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+	<script type="text/javascript"	src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script	src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.28.4/dist/sweetalert2.all.min.js"></script>
 	<script type="text/javascript">
-		$(document).ready(function() {
-			$(".button-collapse").sideNav();
-		})
+	$(document).ready(function() {
+		$(".button-collapse").sideNav();
+	})
 
-	  function myFunction() {
-	    var input, filter, table, tr, td, i;
-	    input = document.getElementById("search");
-	    filter = input.value.toUpperCase();
-	    table = document.getElementById("myTable");
-	    tr = table.getElementsByTagName("tr");
-	    for (i = 0; i < tr.length; i++) {
-	    	nome = tr[i].getElementsByTagName("td")[0];
-	    	tipo = tr[i].getElementsByTagName("td")[3];
-	    	raca = tr[i].getElementsByTagName("td")[4];
-	    	prop = tr[i].getElementsByTagName("td")[5];
-	    	if (nome || tipo || raca || prop) {
-				if (nome.innerHTML.toUpperCase().indexOf(filter) > -1 || tipo.innerHTML.toUpperCase().indexOf(filter) > -1 || raca.innerHTML.toUpperCase().indexOf(filter) > -1 || prop.innerHTML.toUpperCase().indexOf(filter) > -1) {
-		  		tr[i].style.display = "";
-			} else {
-		  		tr[i].style.display = "none";
+	function DelClick(id){
+		swal({
+			title: 'Are you sure?',
+			text: "You won't be able to revert this!",
+			type: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#3085d6',
+			cancelButtonColor: '#d33',
+			confirmButtonText: 'Yes, delete it!'
+		}).then((result) => {
+			if (result.value) {
+				swal(
+					'Deleted!',
+					'Your file has been deleted.',
+					'success'
+				)
+				$.get('/delAnimal/'+id, function(){
+					$('#animal-'+id).remove();
+				});
 			}
-	      }
-	    }
-	  }
+		})
+		return false;
+	}
+
+	function myFunction() {
+		var input, filter, table, tr, td, i;
+		input = document.getElementById("search");
+		filter = input.value.toUpperCase();
+		table = document.getElementById("myTable");
+		tr = table.getElementsByTagName("tr");
+		for (i = 0; i < tr.length; i++) {
+			nome = tr[i].getElementsByTagName("td")[0];
+			tipo = tr[i].getElementsByTagName("td")[3];
+			raca = tr[i].getElementsByTagName("td")[4];
+			prop = tr[i].getElementsByTagName("td")[5];
+			if (nome || tipo || raca || prop) {
+				if (nome.innerHTML.toUpperCase().indexOf(filter) > -1 || tipo.innerHTML.toUpperCase().indexOf(filter) > -1 || raca.innerHTML.toUpperCase().indexOf(filter) > -1 || prop.innerHTML.toUpperCase().indexOf(filter) > -1) {
+					tr[i].style.display = "";
+				} else {
+					tr[i].style.display = "none";
+				}
+			}
+		}
+	}
 	</script>
 
 </body>

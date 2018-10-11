@@ -46,14 +46,14 @@
 
 			<tbody>
 				{{#medicines}}
-				<tr>
-					<td><div style="width: 30%;"><img class="responsive-img" src="/picMedicine/{{ID}}"></div></td>
+				<tr id="medicine-{{ID}}">
+					<td style="width: 10%;"><img class="responsive-img" src="/picMedicine/{{ID}}"></td>
 					<td>{{Name}}</td>
 					<td>{{Description}}</td>
 					<td>{{ExpirationFmt}}</td>
 					<td>{{Type.Type}}</td>
 					<td><a href="/editMedicine/{{ID}}"><i class="material-icons left">edit</i></a></a></td>
-					<td><a href="/delMedicine/{{ID}}"><i class="material-icons left">delete</i></a></a></td>
+					<td><a onclick="DelClick({{ID}})" class="waves-effect waves-light btn-small"><i class="material-icons left">delete</i></a></a></td>
 				</tr>
 				{{/medicines}}
 			</tbody>
@@ -66,10 +66,35 @@
 	<script type="text/javascript"
 	src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 	<script 	src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.28.4/dist/sweetalert2.all.min.js"></script>
 	<script type="text/javascript">
 	$(document).ready(function() {
 		$(".button-collapse").sideNav();
 	})
+
+	function DelClick(id){
+		swal({
+			title: 'Are you sure?',
+			text: "You won't be able to revert this!",
+			type: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#3085d6',
+			cancelButtonColor: '#d33',
+			confirmButtonText: 'Yes, delete it!'
+		}).then((result) => {
+			if (result.value) {
+				swal(
+					'Deleted!',
+					'Your file has been deleted.',
+					'success'
+				)
+				$.get('/delMedicine/'+id, function(){
+					$('#medicine-'+id).remove();
+				});
+			}
+		})
+		return false;
+	}
 
 	function myFunction() {
 		var input, filter, table, tr, td, i;
