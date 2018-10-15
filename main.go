@@ -106,12 +106,28 @@ func main() {
 
 	logado.HandleFunc("/fazenda.xlsx", exportExcel)
 
+	logado.HandleFunc("/preferences", preferences)
+	logado.HandleFunc("/breed", getBreed)
+	logado.HandleFunc("/newBreed", postBreed)
+	logado.HandleFunc("/delBreed/{idBreed}", delBreed)
+
+	logado.HandleFunc("/purp", getPurp)
+	logado.HandleFunc("/newPurp", postPurp)
+	logado.HandleFunc("/delPurp/{idPurp}", delPurp)
+
+	logado.HandleFunc("/typea", getTypeA)
+	logado.HandleFunc("/newTypeA", postTypeA)
+	logado.HandleFunc("/delTypeA/{idType}", delTypeA)
+
+	logado.HandleFunc("/typem", getTypeM)
+	logado.HandleFunc("/newTypeM", postTypeM)
+	logado.HandleFunc("/delTypeM/{idType}", delTypeM)
+
 	port := os.Getenv("PORT")
 	http.ListenAndServe(":"+port, r)
 }
 
 func exportExcel(w http.ResponseWriter, r *http.Request) {
-
 	var file *xlsx.File
 	var sheet *xlsx.Sheet
 	var row *xlsx.Row
@@ -146,6 +162,8 @@ func exportExcel(w http.ResponseWriter, r *http.Request) {
 	dad := row.AddCell()
 	dad.Value = "Pai"
 
+	fmt.Println("Cabeçalho animal não nulo")
+
 	for _, animal := range animals {
 		// element is the element from someSlice for where we are
 		row = sheet.AddRow()
@@ -167,6 +185,8 @@ func exportExcel(w http.ResponseWriter, r *http.Request) {
 		dad.Value = animal.FatherFmt()
 	}
 
+	fmt.Println("Animais não nulos")
+
 	for _, animal := range animals {
 		sheet, _ = file.AddSheet("Peso animal " + animal.Name)
 		row = sheet.AddRow()
@@ -176,6 +196,9 @@ func exportExcel(w http.ResponseWriter, r *http.Request) {
 		desc.Value = "Descrição"
 		data := row.AddCell()
 		data.Value = "Data"
+
+		fmt.Println("Cabeçalho peso animal não nulo")
+
 		db.Where("animal_id = ?", animal.ID).Find(&weights)
 		for _, weight := range weights {
 			row = sheet.AddRow()
@@ -188,6 +211,8 @@ func exportExcel(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	fmt.Println("Peso animal não nulo")
+
 	sheet, _ = file.AddSheet("Remédios")
 	row = sheet.AddRow()
 	name = row.AddCell()
@@ -198,6 +223,8 @@ func exportExcel(w http.ResponseWriter, r *http.Request) {
 	desc.Value = "Descrição"
 	ti = row.AddCell()
 	ti.Value = "Tipo"
+
+	fmt.Println("Cabeçalho remédio não nulo")
 
 	for _, medicine := range medicines {
 		// element is the element from someSlice for where we are
@@ -212,6 +239,8 @@ func exportExcel(w http.ResponseWriter, r *http.Request) {
 		ti.Value = medicine.Type.Type
 	}
 
+	fmt.Println("Remédios não nulos")
+
 	sheet, _ = file.AddSheet("Medicações")
 	row = sheet.AddRow()
 	desc = row.AddCell()
@@ -222,6 +251,8 @@ func exportExcel(w http.ResponseWriter, r *http.Request) {
 	an.Value = "Animais"
 	med := row.AddCell()
 	med.Value = "Remédios"
+
+	fmt.Println("Cabeçalho medicação não nulo")
 
 	for _, medication := range medications {
 		row = sheet.AddRow()
@@ -234,6 +265,8 @@ func exportExcel(w http.ResponseWriter, r *http.Request) {
 		med = row.AddCell()
 		med.Value = medication.MedicinesFmt()
 	}
+
+	fmt.Println("Medicações não nulas")
 
 	file.Write(w)
 
@@ -1081,4 +1114,212 @@ func delWeight(w http.ResponseWriter, r *http.Request) {
 	url := "/weight/" + id
 
 	http.Redirect(w, r, url, http.StatusFound)
+}
+
+func preferences(w http.ResponseWriter, r *http.Request) {
+	context := map[string]interface{}{}
+
+	str, _ := mustache.RenderFileInLayout("templates/navbar.template.html", "templates/preferences.html", context)
+	bit := []byte(str)
+	w.Write(bit)
+}
+
+func getBreed(w http.ResponseWriter, r *http.Request) {
+	ctx := GetContext(w, r)
+	breeds := []Breed{}
+	db.Where("user_id = 0 OR user_id = ?", ctx.User.ID).Find(&breeds, &Breed{})
+
+	context := map[string]interface{}{
+		"breeds": breeds,
+	}
+
+	str, _ := mustache.RenderFileInLayout("templates/navbar.template.html", "templates/breed.html", context)
+	bit := []byte(str)
+	w.Write(bit)
+}
+
+func postBreed(w http.ResponseWriter, r *http.Request) {
+	breed := Breed{}
+	breed.Breed = r.PostFormValue("Breed")
+	breed.Description = r.PostFormValue("Description")
+
+	ctx := GetContext(w, r)
+	breed.User = ctx.User
+	history := History{}
+	history.Description = "Raça cadastrada: " + breed.Breed
+	history.User = ctx.User
+	history.Date = time.Now()
+	db.Save(&history)
+
+	db.Save(&breed)
+
+	http.Redirect(w, r, "/breed", http.StatusFound)
+}
+
+func delBreed(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	idBreed, _ := strconv.Atoi(vars["idBreed"])
+	breed := Breed{}
+	db.Find(&breed, idBreed)
+
+	ctx := GetContext(w, r)
+	history := History{}
+	history.Description = "Exclusão de raça realizada: " + breed.Breed
+	history.User = ctx.User
+	history.Date = time.Now()
+	db.Save(&history)
+
+	db.Delete(&breed)
+
+	http.Redirect(w, r, "/breed", http.StatusFound)
+}
+
+func getPurp(w http.ResponseWriter, r *http.Request) {
+	ctx := GetContext(w, r)
+	purps := []Purpose{}
+	db.Where("user_id = 0 OR user_id = ?", ctx.User.ID).Find(&purps, &Purpose{})
+
+	context := map[string]interface{}{
+		"purps": purps,
+	}
+
+	str, _ := mustache.RenderFileInLayout("templates/navbar.template.html", "templates/purp.html", context)
+	bit := []byte(str)
+	w.Write(bit)
+}
+
+func postPurp(w http.ResponseWriter, r *http.Request) {
+	purp := Purpose{}
+	purp.Purpose = r.PostFormValue("Purpose")
+	purp.Description = r.PostFormValue("Description")
+
+	ctx := GetContext(w, r)
+	purp.User = ctx.User
+	history := History{}
+	history.Description = "Finalidade cadastrada: " + purp.Purpose
+	history.User = ctx.User
+	history.Date = time.Now()
+	db.Save(&history)
+
+	db.Save(&purp)
+
+	http.Redirect(w, r, "/purp", http.StatusFound)
+}
+
+func delPurp(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	idPurp, _ := strconv.Atoi(vars["idPurp"])
+	purp := Purpose{}
+	db.Find(&purp, idPurp)
+
+	ctx := GetContext(w, r)
+	history := History{}
+	history.Description = "Exclusão de finalidade realizada: " + purp.Purpose
+	history.User = ctx.User
+	history.Date = time.Now()
+	db.Save(&history)
+
+	db.Delete(&purp)
+
+	http.Redirect(w, r, "/purp", http.StatusFound)
+}
+
+func getTypeA(w http.ResponseWriter, r *http.Request) {
+	ctx := GetContext(w, r)
+	types := []TypeAnimal{}
+	db.Where("user_id = 0 OR user_id = ?", ctx.User.ID).Find(&types, &TypeAnimal{})
+
+	context := map[string]interface{}{
+		"types": types,
+	}
+
+	str, _ := mustache.RenderFileInLayout("templates/navbar.template.html", "templates/typea.html", context)
+	bit := []byte(str)
+	w.Write(bit)
+}
+
+func postTypeA(w http.ResponseWriter, r *http.Request) {
+	typea := TypeAnimal{}
+	typea.Type = r.PostFormValue("Type")
+	typea.Description = r.PostFormValue("Description")
+
+	ctx := GetContext(w, r)
+	typea.User = ctx.User
+	history := History{}
+	history.Description = "Tipo de animal cadastrado: " + typea.Type
+	history.User = ctx.User
+	history.Date = time.Now()
+	db.Save(&history)
+
+	db.Save(&typea)
+
+	http.Redirect(w, r, "/typea", http.StatusFound)
+}
+
+func delTypeA(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	idType, _ := strconv.Atoi(vars["idType"])
+	typea := TypeAnimal{}
+	db.Find(&typea, idType)
+
+	ctx := GetContext(w, r)
+	history := History{}
+	history.Description = "Exclusão de tipo de animal realizado: " + typea.Type
+	history.User = ctx.User
+	history.Date = time.Now()
+	db.Save(&history)
+
+	db.Delete(&typea)
+
+	http.Redirect(w, r, "/typea", http.StatusFound)
+}
+
+func getTypeM(w http.ResponseWriter, r *http.Request) {
+	ctx := GetContext(w, r)
+	types := []TypeMedicine{}
+	db.Where("user_id = 0 OR user_id = ?", ctx.User.ID).Find(&types, &TypeMedicine{})
+
+	context := map[string]interface{}{
+		"types": types,
+	}
+
+	str, _ := mustache.RenderFileInLayout("templates/navbar.template.html", "templates/typem.html", context)
+	bit := []byte(str)
+	w.Write(bit)
+}
+
+func postTypeM(w http.ResponseWriter, r *http.Request) {
+	typem := TypeMedicine{}
+	typem.Type = r.PostFormValue("Type")
+	typem.Description = r.PostFormValue("Description")
+
+	ctx := GetContext(w, r)
+	typem.User = ctx.User
+	history := History{}
+	history.Description = "Tipo de remédio cadastrado: " + typem.Type
+	history.User = ctx.User
+	history.Date = time.Now()
+	db.Save(&history)
+
+	db.Save(&typem)
+
+	http.Redirect(w, r, "/typem", http.StatusFound)
+}
+
+func delTypeM(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	idType, _ := strconv.Atoi(vars["idType"])
+	typem := TypeMedicine{}
+	db.Find(&typem, idType)
+
+	ctx := GetContext(w, r)
+	history := History{}
+	history.Description = "Exclusão de tipo de remédio realizado: " + typem.Type
+	history.User = ctx.User
+	history.Date = time.Now()
+	db.Save(&history)
+
+	db.Delete(&typem)
+
+	http.Redirect(w, r, "/typem", http.StatusFound)
 }

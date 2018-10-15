@@ -48,6 +48,11 @@
 			"Rev": "4ded0e9383f75c197b3a2aaa6d590ac52df6fd79"
 		},
 		{
+			"ImportPath": "github.com/tealeg/xlsx",
+			"Comment": "v1.0.3-78-gf1917ad",
+			"Rev": "f1917addaa283ecd881e40b48173544d4145ea67"
+		},
+		{
 			"ImportPath": "golang.org/x/crypto/bcrypt",
 			"Rev": "614d502a4dac94afa3a6ce146bd1736da82514c6"
 		},

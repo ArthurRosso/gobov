@@ -5,4 +5,7 @@ type TypeMedicine struct {
 	Type        string
 	Description string
 	Medicines   []Medicine
+	User        *User
+
+	UserID int
 }

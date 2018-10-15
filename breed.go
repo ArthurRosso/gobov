@@ -5,4 +5,7 @@ type Breed struct {
 	Breed       string
 	Description string
 	Animals     []Animal
+	User        *User
+
+	UserID int
 }
