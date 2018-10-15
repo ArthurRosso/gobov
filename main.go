@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
+	"github.com/tealeg/xlsx"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -103,9 +104,140 @@ func main() {
 	r.HandleFunc("/login", login)
 	logado.HandleFunc("/logout", logout)
 
+	logado.HandleFunc("/fazenda.xlsx", exportExcel)
+
 	port := os.Getenv("PORT")
-	fmt.Println("Server listen and serve on port" + port)
 	http.ListenAndServe(":"+port, r)
+}
+
+func exportExcel(w http.ResponseWriter, r *http.Request) {
+
+	var file *xlsx.File
+	var sheet *xlsx.Sheet
+	var row *xlsx.Row
+	animals := []Animal{}
+	weights := []Weight{}
+	medicines := []Medicine{}
+	medications := []Medication{}
+	ctx := GetContext(w, r)
+	db.Where("user_id = ?", ctx.User.ID).Preload("Animals").Preload("Medicines").Find(&medications, Medication{})
+	db.Where("user_id = ?", ctx.User.ID).Preload("Type").Find(&medicines, Medicine{})
+	db.Where("user_id = ?", ctx.User.ID).Preload("Weights").Preload("Type").Preload("Breed").Preload("Purposes").Find(&animals, Animal{})
+
+	file = xlsx.NewFile()
+
+	sheet, _ = file.AddSheet("Animais")
+
+	row = sheet.AddRow()
+	name := row.AddCell()
+	name.Value = "Identificador"
+	birth := row.AddCell()
+	birth.Value = "Data nasc"
+	we := row.AddCell()
+	we.Value = "Peso atual"
+	ti := row.AddCell()
+	ti.Value = "Tipo"
+	br := row.AddCell()
+	br.Value = "Raça"
+	prop := row.AddCell()
+	prop.Value = "Propósito"
+	mom := row.AddCell()
+	mom.Value = "Mãe"
+	dad := row.AddCell()
+	dad.Value = "Pai"
+
+	for _, animal := range animals {
+		// element is the element from someSlice for where we are
+		row = sheet.AddRow()
+		name := row.AddCell()
+		name.Value = animal.Name
+		birth := row.AddCell()
+		birth.Value = animal.BirthFmt()
+		we := row.AddCell()
+		we.Value = animal.WeightFmt()
+		ti := row.AddCell()
+		ti.Value = animal.Type.Type
+		br := row.AddCell()
+		br.Value = animal.Breed.Breed
+		prop := row.AddCell()
+		prop.Value = animal.PurposesFmt()
+		mom := row.AddCell()
+		mom.Value = animal.MotherFmt()
+		dad := row.AddCell()
+		dad.Value = animal.FatherFmt()
+	}
+
+	for _, animal := range animals {
+		sheet, _ = file.AddSheet("Peso animal " + animal.Name)
+		row = sheet.AddRow()
+		wei := row.AddCell()
+		wei.Value = "Peso"
+		desc := row.AddCell()
+		desc.Value = "Descrição"
+		data := row.AddCell()
+		data.Value = "Data"
+		db.Where("animal_id = ?", animal.ID).Find(&weights)
+		for _, weight := range weights {
+			row = sheet.AddRow()
+			wei := row.AddCell()
+			wei.Value = fmt.Sprintf("%f3", weight.Weight)
+			desc := row.AddCell()
+			desc.Value = weight.Description
+			date := row.AddCell()
+			date.Value = weight.DateFmt()
+		}
+	}
+
+	sheet, _ = file.AddSheet("Remédios")
+	row = sheet.AddRow()
+	name = row.AddCell()
+	name.Value = "Nome"
+	exp := row.AddCell()
+	exp.Value = "Validade"
+	desc := row.AddCell()
+	desc.Value = "Descrição"
+	ti = row.AddCell()
+	ti.Value = "Tipo"
+
+	for _, medicine := range medicines {
+		// element is the element from someSlice for where we are
+		row = sheet.AddRow()
+		name := row.AddCell()
+		name.Value = medicine.Name
+		exp := row.AddCell()
+		exp.Value = medicine.ExpirationFmt()
+		desc := row.AddCell()
+		desc.Value = medicine.Description
+		ti := row.AddCell()
+		ti.Value = medicine.Type.Type
+	}
+
+	sheet, _ = file.AddSheet("Medicações")
+	row = sheet.AddRow()
+	desc = row.AddCell()
+	desc.Value = "Descrição"
+	date := row.AddCell()
+	date.Value = "Data"
+	an := row.AddCell()
+	an.Value = "Animais"
+	med := row.AddCell()
+	med.Value = "Remédios"
+
+	for _, medication := range medications {
+		row = sheet.AddRow()
+		desc := row.AddCell()
+		desc.Value = medication.Description
+		date := row.AddCell()
+		date.Value = medication.DateFmt()
+		an = row.AddCell()
+		an.Value = medication.AnimalsFmt()
+		med = row.AddCell()
+		med.Value = medication.MedicinesFmt()
+	}
+
+	file.Write(w)
+
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func loggingMiddleware(next http.Handler) http.Handler {
@@ -691,7 +823,7 @@ func repostMedicine(w http.ResponseWriter, r *http.Request) {
 	r.ParseMultipartForm(0)
 	f := r.MultipartForm
 	if f == nil {
-		fmt.Println("Erro no formulário")
+		fmt.Println("_o no formulário")
 	}
 	file := f.File["Picture"]
 	arquivo, _ := file[0].Open()

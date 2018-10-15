@@ -37,6 +37,22 @@ func (a Animal) BirthFmt() string {
 	return a.Birthday.Format("02/01/2006")
 }
 
+func (a Animal) MotherFmt() string {
+	if a.Mother == nil {
+		return "Sem mãe"
+	} else {
+		return a.Mother.Name
+	}
+}
+
+func (a Animal) FatherFmt() string {
+	if a.Father == nil {
+		return "Sem pai"
+	} else {
+		return a.Father.Name
+	}
+}
+
 func (a Animal) BirthPFmt() string {
 	return a.Birthday.Format("2006-01-02")
 }
