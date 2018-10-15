@@ -5,6 +5,9 @@ type Purpose struct {
 	Purpose     string
 	Description string
 	Animals     []Animal `gorm:"many2many:animal_purpose"`
+	User        *User
+
+	UserID int
 }
 
 func (p Purpose) String() string {
