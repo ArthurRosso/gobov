@@ -1,0 +1,24 @@
+language: go
+
+install:
+  - go get -d -t -v ./... && go build -v ./...
+
+go:
+  - 1.8.x
+  - 1.9.x
+  - 1.10.x
+  - 1.11.x
+
+install:
+  # Add Godeps dependencies to GOPATH and PATH
+  - export GOPATH="${TRAVIS_BUILD_DIR}/Godeps/_workspace:$GOPATH"
+  - export PATH="${TRAVIS_BUILD_DIR}/Godeps/_workspace/bin:$PATH"
+
+os:
+  - linux
+  - osx
+
+env:
+  matrix:
+    - GOARCH=amd64
+    - GOARCH=386
