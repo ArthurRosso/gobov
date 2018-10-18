@@ -409,13 +409,13 @@ func getAnimal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	types := []TypeAnimal{}
-	db.Find(&types, &TypeAnimal{})
+	db.Where("user_id = ? OR user_id = 0", ctx.User.ID).Find(&types, &TypeAnimal{})
 
 	breeds := []Breed{}
-	db.Find(&breeds, &Breed{})
+	db.Where("user_id = ? OR user_id = 0", ctx.User.ID).Find(&breeds, &Breed{})
 
 	purposes := []Purpose{}
-	db.Find(&purposes, &Purpose{})
+	db.Where("user_id = ? OR user_id = 0", ctx.User.ID).Find(&purposes, &Purpose{})
 
 	context := map[string]interface{}{
 		"types":    types,
@@ -742,7 +742,7 @@ func getMedicine(w http.ResponseWriter, r *http.Request) {
 	db.Where("user_id = ?", ctx.User.ID).Preload("Type").Find(&medicines, Medicine{})
 
 	types := []TypeMedicine{}
-	db.Find(&types, &TypeMedicine{})
+	db.Where("user_id = ? OR user_id = 0", ctx.User.ID).Find(&types, &TypeMedicine{})
 
 	context := map[string]interface{}{
 		"types":     types,
