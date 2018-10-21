@@ -9,7 +9,6 @@ import (
 type Animal struct {
 	ID          int
 	Name        string
-	Active      bool
 	Birthday    time.Time
 	Weights     []Weight
 	Type        *TypeAnimal
