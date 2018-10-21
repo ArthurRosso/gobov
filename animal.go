@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math"
+	"strconv"
 	"time"
 )
 
@@ -29,7 +30,7 @@ type Animal struct {
 }
 
 func NewAnimal() Animal {
-	return Animal{Active: true}
+	return Animal{}
 }
 
 func (a Animal) BirthFmt() string {
@@ -44,11 +45,33 @@ func (a Animal) MotherFmt() string {
 	}
 }
 
+func (a Animal) MainPicFmt() int {
+	pic := Picture{}
+	db.Where("main=? and animal_id=?", 1, a.ID).First(&pic)
+	return pic.ID
+}
+
+func (a Animal) MotherPicFmt() string {
+	if a.Mother == nil {
+		return ""
+	} else {
+		return "/pic/" + strconv.Itoa(a.Mother.MainPicFmt())
+	}
+}
+
 func (a Animal) FatherFmt() string {
 	if a.Father == nil {
 		return "Sem pai"
 	} else {
 		return a.Father.Name
+	}
+}
+
+func (a Animal) FatherPicFmt() string {
+	if a.Father == nil {
+		return ""
+	} else {
+		return strconv.Itoa(a.Father.MainPicFmt())
 	}
 }
 
@@ -61,6 +84,14 @@ func (a Animal) WeightFmt() string {
 		return fmt.Sprint(a.Weights[len(a.Weights)-1].Weight)
 	} else {
 		return ":("
+	}
+}
+
+func (a Animal) WeightPFmt() float32 {
+	if len(a.Weights) > 0 {
+		return a.Weights[len(a.Weights)-1].Weight
+	} else {
+		return 0
 	}
 }
 

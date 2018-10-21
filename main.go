@@ -518,7 +518,7 @@ func postAnimal(w http.ResponseWriter, r *http.Request) {
 
 	if files == nil {
 		pic := Picture{Main: true, AnimalID: animal.ID}
-		f, _ := ioutil.ReadFile("static/cow-and-moon.jpg")
+		f, _ := ioutil.ReadFile("static/cow-vector.jpg")
 		pic.Picture = f
 		db.Save(&pic)
 	}
@@ -543,10 +543,11 @@ func postAnimal(w http.ResponseWriter, r *http.Request) {
 
 func editAnimal(w http.ResponseWriter, r *http.Request) {
 	ctx := GetContext(w, r)
+
 	m := mux.Vars(r)
 	id, _ := strconv.Atoi(m["ID"])
 	animal := Animal{ID: id}
-	db.Where("user_id = ?", ctx.User.ID).Preload("Weights").Preload("Type").Preload("Breed").Preload("Purposes").Find(&animal, Animal{})
+	db.Where("user_id = ?", ctx.User.ID).Preload("Weights").Preload("Type").Preload("Breed").Preload("Purposes").First(&animal, &Animal{})
 
 	animals := []Animal{}
 	db.Where("user_id = ?", ctx.User.ID).Preload("Weights").Preload("Type").Preload("Breed").Preload("Purposes").Find(&animals, Animal{})
@@ -563,13 +564,13 @@ func editAnimal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	types := []TypeAnimal{}
-	db.Find(&types, &TypeAnimal{})
+	db.Where("user_id = ? OR user_id = 0", ctx.User.ID).Find(&types, &TypeAnimal{})
 
 	breeds := []Breed{}
-	db.Find(&breeds, &Breed{})
+	db.Where("user_id = ? OR user_id = 0", ctx.User.ID).Find(&breeds, &Breed{})
 
 	purposes := []Purpose{}
-	db.Find(&purposes, &Purpose{})
+	db.Where("user_id = ? OR user_id = 0", ctx.User.ID).Find(&purposes, &Purpose{})
 
 	context := map[string]interface{}{
 		"animal":   animal,
@@ -597,15 +598,6 @@ func repostAnimal(w http.ResponseWriter, r *http.Request) {
 
 	db.Preload("Medications").Preload("Purposes").First(&animal)
 
-	db.Exec("DELETE FROM weights WHERE animal_id=?", id)
-	db.Exec("DELETE FROM animal_purpose WHERE animal_id=?", id)
-	db.Exec("DELETE FROM medication_animal WHERE animal_id=?", id)
-
-	db.Where("animal_id = ?", id).Delete(&Picture{})
-
-	db.Delete(&animal)
-
-	animal = NewAnimal()
 	name := r.PostFormValue("Name")
 	animal.Name = name
 
@@ -630,9 +622,12 @@ func repostAnimal(w http.ResponseWriter, r *http.Request) {
 		Description: "Primeira pesagem",
 		Date:        birth,
 	}
+
 	peso, _ := strconv.ParseFloat(r.PostFormValue("Weight"), 32)
-	weight.Weight = float32(peso)
-	animal.Weights = append(animal.Weights, weight)
+	if float32(peso) != animal.WeightPFmt() {
+		weight.Weight = float32(peso)
+		animal.Weights = append(animal.Weights, weight)
+	}
 
 	typeA := TypeAnimal{}
 	idType, _ := strconv.Atoi(r.PostFormValue("Type"))
@@ -647,12 +642,16 @@ func repostAnimal(w http.ResponseWriter, r *http.Request) {
 	db.First(&animal.Breed, idBreed)
 
 	r.ParseForm()
-	for _, idPurposes := range r.Form["Purpose"] {
-		// element is the element from someSlice for where we are
-		purpose := Purpose{}
-		id, _ := strconv.Atoi(idPurposes)
-		db.Find(&purpose, id)
-		animal.Purposes = append(animal.Purposes, purpose)
+	if r.Form["Purpose"] != nil {
+		db.Exec("DELETE FROM animal_purpose WHERE animal_id=?", id)
+		animal.Purposes = []Purpose{}
+		for _, idPurposes := range r.Form["Purpose"] {
+			// element is the element from someSlice for where we are
+			purpose := Purpose{}
+			id, _ := strconv.Atoi(idPurposes)
+			db.Find(&purpose, id)
+			animal.Purposes = append(animal.Purposes, purpose)
+		}
 	}
 
 	r.ParseMultipartForm(0)
@@ -669,6 +668,10 @@ func repostAnimal(w http.ResponseWriter, r *http.Request) {
 	animal.User = ctx.User
 
 	db.Save(&animal)
+
+	if files != nil {
+		db.Where("animal_id = ?", id).Delete(&Picture{})
+	}
 
 	if len(files) > 0 {
 		pic := Picture{Main: true, AnimalID: animal.ID}
@@ -762,7 +765,7 @@ func editMedicine(w http.ResponseWriter, r *http.Request) {
 	db.Where("user_id = ?", ctx.User.ID).Preload("Type").First(&medicine, Medicine{})
 
 	types := []TypeMedicine{}
-	db.Find(&types, &TypeMedicine{})
+	db.Where("user_id = ? OR user_id = 0", ctx.User.ID).Find(&types, &TypeMedicine{})
 
 	context := map[string]interface{}{
 		"types":    types,
@@ -822,6 +825,8 @@ func postMedicine(w http.ResponseWriter, r *http.Request) {
 		arquivo, _ := file[0].Open()
 		medicine.Picture, _ = ioutil.ReadAll(arquivo)
 		arquivo.Close()
+	} else {
+		medicine.Picture, _ = ioutil.ReadFile("static/medicine-vector.png")
 	}
 	db.Save(&medicine)
 
@@ -835,10 +840,6 @@ func repostMedicine(w http.ResponseWriter, r *http.Request) {
 	medicine := Medicine{ID: id}
 	db.Preload("Medications").First(&medicine)
 
-	db.Exec("DELETE FROM medication_medicine WHERE medicine_id=?", id)
-	db.Where("ID = ?", id).Delete(&Medicine{})
-
-	medicine = NewMedicine()
 	name := r.PostFormValue("Name")
 	medicine.Name = name
 
@@ -846,6 +847,12 @@ func repostMedicine(w http.ResponseWriter, r *http.Request) {
 	medicine.Expiration = expiration
 
 	medicine.Description = r.PostFormValue("Description")
+
+	history := History{}
+	history.Description = "Remédio editado: " + name
+	history.User = ctx.User
+	history.Date = time.Now()
+	db.Save(&history)
 
 	typeM := TypeMedicine{}
 	idType, _ := strconv.Atoi(r.PostFormValue("Type"))
@@ -855,13 +862,12 @@ func repostMedicine(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseMultipartForm(0)
 	f := r.MultipartForm
-	if f == nil {
-		fmt.Println("_o no formulário")
-	}
 	file := f.File["Picture"]
-	arquivo, _ := file[0].Open()
-	medicine.Picture, _ = ioutil.ReadAll(arquivo)
-	defer arquivo.Close()
+	if file != nil {
+		arquivo, _ := file[0].Open()
+		medicine.Picture, _ = ioutil.ReadAll(arquivo)
+		defer arquivo.Close()
+	}
 
 	medicine.User = ctx.User
 

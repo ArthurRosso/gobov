@@ -5,7 +5,6 @@ import "time"
 type Medicine struct {
 	ID          int
 	Name        string
-	Active      bool
 	Expiration  time.Time
 	Description string
 	Type        *TypeMedicine
@@ -18,7 +17,7 @@ type Medicine struct {
 }
 
 func NewMedicine() Medicine {
-	return Medicine{Active: true}
+	return Medicine{}
 }
 
 func (m Medicine) ExpirationFmt() string {

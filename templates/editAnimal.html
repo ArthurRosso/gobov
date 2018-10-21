@@ -2,7 +2,7 @@
 <html>
 <head>
 
-	<title>GoBov - Edit Animal</title>
+	<title>GoBov - Editar Animal</title>
 
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -24,20 +24,26 @@
 	<div class="row">
 		<div class="container">
 			<div class="card-panel">
-				<form method="post" action="/renewAnimal/{{animal.ID}}" enctype="multipart/form-data" >
+				<form method="post" action="/renewAnimal/{{animal.ID}}" enctype="multipart/form-data" onsubmit="Check(this)" >
 					<div class="row">
 						<div class="input-field col s6">
-							Indentificador: <input value="{{animal.Name}}" type="text" name="Name" class="validate" required="" aria-required="true" />
+							Identificador (Nome): <input value="{{animal.Name}}" type="text" name="Name" class="validate" required="" aria-required="true" />
 						</div>
 						<div class="input-field col s6">
-							Data de Nascimento: <input value="{{animal.BirthPFmt}}" type="date" name="Birthday" class="validate" required="" aria-required="true" />
+							Data de Nascimento: <input value="{{animal.BirthPFmt}}" id="birthday" type="date" name="Birthday" class="validate" required="" aria-required="true" />
 						</div>
 						<div class="input-field col s6">
-							Peso atual: <input value="{{animal.WeightFmt}}"  type="text" name="Weight" class="validate" required="" aria-required="true" />
+							<div class="row">
+
+								<div class="col s12 valign-wrapper">
+									Peso atual:
+									<input value="{{animal.WeightPFmt}}" type="number" name="Weight" min="0" class="validate" required="" aria-required="true" />kg
+								</div>
+							</div>
 						</div>
 						<div class="input-field col s6">
 							Tipo:
-							<select id="type" name="Type" class="validate" required="" aria-required="true">
+							<select name="Type" class="validate" required="" aria-required="true">
 								{{ #types }}
 								<option value="{{ID}}">{{Type}}</option>
 								{{ /types }}
@@ -45,7 +51,7 @@
 						</div>
 						<div class="input-field col s6">
 							Raça:
-							<select id="breed" name="Breed" class="validate" required="" aria-required="true">
+							<select name="Breed" class="validate" required="" aria-required="true">
 								{{ #breeds }}
 								<option value="{{ID}}">{{Breed}}</option>
 								{{ /breeds }}
@@ -53,7 +59,7 @@
 						</div>
 						<div class="input-field col s6">
 							Finalidade:
-							<select id="purposes" multiple name="Purpose">
+							<select multiple name="Purpose">
 								{{ #purposes }}
 								<option value="{{ID}}">{{Purpose}}</option>
 								{{ /purposes }}
@@ -61,7 +67,7 @@
 						</div>
 						<div class="input-field col s6">
 							Mãe:
-							<select id="mother" name="Mother" class="validate" required="" aria-required="true">
+							<select name="Mother" class="validate" required="" aria-required="true">
 								<option value="0">Sem mãe</option>
 								{{ #mothers }}
 								<option value="{{ID}}">{{Name}}</option>
@@ -70,7 +76,7 @@
 						</div>
 						<div class="input-field col s6">
 							Pai:
-							<select id="father" name="Father" class="validate" required="" aria-required="true">
+							<select name="Father" class="validate" required="" aria-required="true">
 								<option value="0">Sem pai</option>
 								{{ #fathers }}
 								<option value="{{ID}}">{{Name}}</option>
@@ -81,11 +87,11 @@
 						<div class="input-field col s12">
 							<div class="file-field input-field">
 								<div class="btn teal darken-3">
-									<span>Fotos</span>
-									<input name="Pictures" type="file" multiple>
+									<span>Foto <small>(opcional)</small></span>
+									<input id="filename" name="Pictures" accept="image/png, image/jpeg" type="file" multiple>
 								</div>
 								<div class="file-path-wrapper">
-									<input value="" class="file-path validate" name="Pictures" type="text" placeholder="Uma ou mais fotos.">
+									<input id="filename" class="file-path validate" name="Pictures" type="text" accept="image/png, image/jpeg" placeholder="Adicione uma foto.">
 								</div>
 							</div>
 						</div>
@@ -98,37 +104,55 @@
 				</div>
 			</form>
 		</div>
-		<div class="right-align">
-			<a class="waves-effect waves-light btn teal darken-3" href="/listaAnimal"><i class="material-icons left">list</i>Lista de animais</a>
-		</div>
 	</div>
 </div>
 
-	<script type="text/javascript"
-	src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-	<script
-	src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
-	<script type="text/javascript">
-		$(document).ready(function() {
-			$(".button-collapse").sideNav();
-			$('select').material_select();
-			$("#type").val({{animal.Type.ID}});
-			$("#breed").val({{animal.Breed.ID}});
+<script type="text/javascript"
+src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script
+src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+	$(".button-collapse").sideNav();
+	$('select').material_select();
+	var dtToday = new Date();
 
-			var vet = [
-				{{#animal.Purposes}}
-					{{ID}},
-				{{/animal.Purposes}}
-			]
+	var month = dtToday.getMonth() + 1;
+	var day = dtToday.getDate();
+	var year = dtToday.getFullYear();
 
-			$.each(vet, function(i,e){
-			    $("#purposes option[value='" + e + "']").prop("selected", true);
-			});
-			$("#mother").val({{animal.MotherID}});
-			$("#father").val({{animal.FatherID}});
-			$('select').material_select();
-		})
-	</script>
+	if(month < 10)
+	month = '0' + month.toString();
+	if(day < 10)
+	day = '0' + day.toString();
+
+	var maxDate = year + '-' + month + '-' + day;
+	$('#birthday').attr('max', maxDate);
+})
+
+function Check(){
+
+	var fup = document.getElementById('file');
+	var fileName = fup.value;
+	var ext = fileName.substring(fileName.lastIndexOf('.') + 1);
+
+	if(ext =="jpeg" || ext=="png"){
+		tamanho_imagem = fup.fileSize
+		if (tamanho_imagem > 15000){
+			alert("O tamanho da Imagem é muito grande ...  "+tamanho_imagem+" Bytes!!");
+			location.reload();
+		}
+		else{
+			alert("Imagem ok");
+		}
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+</script>
 
 </body>
 

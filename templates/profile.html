@@ -72,12 +72,12 @@
 					<div class="row">
 
 						<div class="col s6">
-							<a href="/profile/{{animal.Father.ID}}" ><p>Pai: {{animal.Father.Name}}</p>
-								<img src="/pic/{{animal.Father.MainPic.ID}}" style="width:100px"></a>
+							<a href="/profile/{{animal.Father.ID}}" ><p>Pai: {{animal.FatherFmt}}</p>
+								<img src="{{animal.FatherPicFmt}}" style="width:100px"></a>
 							</div>
 							<div class="col s6">
-								<a href="/profile/{{animal.Mother.ID}}" > <p>Mãe: {{animal.Mother.Name}}</p>
-									<img src="/pic/{{animal.Mother.MainPic.ID}}" style="width:100px"></a>
+								<a href="/profile/{{animal.Mother.ID}}" > <p>Mãe: {{animal.MotherFmt}}</p>
+									<img src="{{animal.MotherPicFmt}}" style="width:100px"></a>
 								</div>
 							</div>
 						</div>
@@ -119,9 +119,9 @@
 				src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
 
 				<script type="text/javascript">
-					$(document).ready(function() {
-						$(".button-collapse").sideNav();
-					})
+				$(document).ready(function() {
+					$(".button-collapse").sideNav();
+				})
 				</script>
 			</body>
 
