@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<title>GoBov - Fazer Medicação</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css" />
+
+</head>
+<body>
+
+	<header>
+
+		{{{content}}}
+
+	</header>
+
+	<div class="container">
+		<div class="card-panel">
+			<form method="post" action="/oneNewMedication/{{animal.ID}}" enctype="multipart/form-data" id="formCheck" >
+				Descrição: <input type="text" name="Description"  />
+				Data: <input id="date" type="date" name="Date" class="validate" required="" aria-required="true" />
+				<br>
+				<div>
+					Remédio:
+					{{ #medicines }}
+					<p id="inputsMed">
+						<input type="checkbox" id="medicine-{{ID}}" name="Medicine" value="{{ID}}" />
+						<label for="medicine-{{ID}}">{{Name}}</label>
+					</p>
+					{{ /medicines }}
+				</div>
+				<div class="right-align">
+					<button class="btn waves-effect waves-light teal darken-3" id="submit"
+					type="submit" onclick="Check(document.getElementById('formCheck')); " name="action">
+					Salvar <i class="material-icons right">save</i>
+				</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+	$(".button-collapse").sideNav();
+	$('select').material_select();
+});
+
+$('#submit').click(function(e){
+	var checked2 = $("#inputsMed input:checked").length;
+	if(checked2 == 0) {
+		event.preventDefault(e);
+		Materialize.toast("Você deve selecionar pelo menos um remédio.", 3000);
+		return false;
+	}
+});
+</script>
+
+</body>
+
+
+</html>

@@ -36,10 +36,10 @@
 				<tr>
 					<th>Identificador</th>
 					<th>Nascimento</th>
-					<th>Peso</th>
-					<th>Tipo</th>
-					<th>Raça</th>
-					<th>Propósito(s)</th>
+					<th>Idade</th>
+					<th>Nro de crias</th>
+					<th>Fazer Pesagem</th>
+					<th>Fazer Medicação</th>
 					<th></th>
 				</tr>
 			</thead>
@@ -49,11 +49,11 @@
 				<tr id="animal-{{ID}}">
 					<td><a href="profile/{{ID}}">{{Name}}</a></td>
 					<td>{{BirthFmt}}</td>
-					<td>{{WeightFmt}}kg</td>
-					<td>{{Type.Type}}</td>
-					<td>{{Breed.Breed}}</td>
-					<td>{{PurposesFmt}}</td>
-					<td><a onclick="DelClick({{ID}})" class="waves-effect waves-light btn-small"><i class="material-icons left">delete</i></a></a></td>
+					<td>{{Age}}</td>
+					<td>{{Children}}</td>
+					<td class="center-align"><a href="/weight/{{ID}}" class="waves-effect waves-light btn-small"><img src="https://png.icons8.com/ios/24/000000/weight-filled.png"></a></td>
+					<td class="center-align"><a href="/oneMedication/{{ID}}" class="waves-effect waves-light btn-small"><img src="https://png.icons8.com/material/24/000000/survival-bag.png"></a></td>
+					<td><a onclick="DelClick({{ID}})" class="waves-effect waves-light btn-small"><i class="material-icons left">delete</i></a></td>
 				</tr>
 				{{/animals}}
 			</tbody>
