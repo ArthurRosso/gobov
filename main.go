@@ -97,6 +97,8 @@ func main() {
 	logado.HandleFunc("/newMedication", postMedication)
 	logado.HandleFunc("/delMedication/{ID}", delMedication)
 	logado.HandleFunc("/listaMedication", getAllMedications)
+	logado.HandleFunc("/oneMedication/{ID}", oneGetMedication)
+	logado.HandleFunc("/oneNewMedication/{ID}", onePostMedication)
 
 	r.HandleFunc("/register", register)
 	r.HandleFunc("/checkRegister", checkRegister)
@@ -125,6 +127,70 @@ func main() {
 
 	port := os.Getenv("PORT")
 	http.ListenAndServe(":"+port, r)
+}
+
+func oneGetMedication(w http.ResponseWriter, r *http.Request) {
+
+	ctx := GetContext(w, r)
+
+	m := mux.Vars(r)
+	id, _ := strconv.Atoi(m["ID"])
+	animal := Animal{ID: id}
+	db.Find(&animal, &Animal{})
+
+	medicines := []Medicine{}
+	db.Where("user_id = ?", ctx.User.ID).Find(&medicines, &Medicine{})
+
+	context := map[string]interface{}{
+		"animal":    animal,
+		"medicines": medicines,
+	}
+
+	str, _ := mustache.RenderFileInLayout("templates/navbar.template.html", "templates/oneMedication.html", context)
+	bit := []byte(str)
+	w.Write(bit)
+}
+
+func onePostMedication(w http.ResponseWriter, r *http.Request) {
+	var res string
+
+	medication := Medication{}
+	desc := r.PostFormValue("Description")
+	medication.Description = desc
+
+	date, _ := time.Parse("2006-01-02", r.PostFormValue("Date"))
+	medication.Date = date
+
+	m := mux.Vars(r)
+	id, _ := strconv.Atoi(m["ID"])
+	animal := Animal{ID: id}
+	db.Find(&animal, &Animal{})
+	medication.Animals = append(medication.Animals, &animal)
+
+	r.ParseForm()
+	for _, idMedicines := range r.Form["Medicine"] {
+		medicine := Medicine{}
+		id, _ := strconv.Atoi(idMedicines)
+		db.Find(&medicine, id)
+		medication.Medicines = append(medication.Medicines, medicine)
+		res += ", " + fmt.Sprint(medicine.Name)
+	}
+
+	ctx := GetContext(w, r)
+	medication.User = ctx.User
+
+	history := History{}
+	history.Description = "Medicação individual realizada: " + animal.Name + " com" + res + " em " + date.String()
+	history.Animals = medication.Animals
+	history.User = ctx.User
+	history.Medication = &medication
+
+	history.Date = time.Now()
+	db.Save(&history)
+
+	db.Save(&medication)
+
+	http.Redirect(w, r, "/listaAnimal", http.StatusFound)
 }
 
 func exportExcel(w http.ResponseWriter, r *http.Request) {
@@ -939,7 +1005,7 @@ func postMedication(w http.ResponseWriter, r *http.Request) {
 	medication.User = ctx.User
 
 	history := History{}
-	history.Description = "Medicação realizada: " + desc
+	history.Description = "Medicação coletiva realizada: " + desc
 	history.Animals = medication.Animals
 	history.User = ctx.User
 	history.Medication = &medication
@@ -1085,7 +1151,7 @@ func postWeight(w http.ResponseWriter, r *http.Request) {
 
 	ctx := GetContext(w, r)
 	history := History{}
-	history.Description = "Pesagem realizada: " + desc + " do animal " + animal.Name
+	history.Description = "Pesagem realizada: " + animal.Name + " " + r.PostFormValue("Weight") + "kg em" + date.String()
 	history.User = ctx.User
 	history.Animals = []*Animal{&animal}
 	history.Date = time.Now()
