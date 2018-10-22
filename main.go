@@ -688,17 +688,6 @@ func repostAnimal(w http.ResponseWriter, r *http.Request) {
 	b := mysql.NullTime{Time: birth, Valid: true}
 	animal.Birthday = b
 
-	weight := Weight{
-		Description: "Primeira pesagem",
-		Date:        b,
-	}
-
-	peso, _ := strconv.ParseFloat(r.PostFormValue("Weight"), 32)
-	if float32(peso) != animal.WeightPFmt() {
-		weight.Weight = float32(peso)
-		animal.Weights = append(animal.Weights, weight)
-	}
-
 	typeA := TypeAnimal{}
 	idType, _ := strconv.Atoi(r.PostFormValue("Type"))
 	db.Find(&typeA, idType)
