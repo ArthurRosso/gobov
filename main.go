@@ -179,16 +179,16 @@ func onePostMedication(w http.ResponseWriter, r *http.Request) {
 	ctx := GetContext(w, r)
 	medication.User = ctx.User
 
+	db.Save(&medication)
+
 	history := History{}
-	history.Description = "Medicação individual realizada: " + animal.Name + " com" + res + " em " + date.String()
+	history.Description = "Medicação individual realizada: " + animal.Name + " com" + res + " em " + medication.DateFmt()
 	history.Animals = medication.Animals
 	history.User = ctx.User
 	history.Medication = &medication
 
 	history.Date = time.Now()
 	db.Save(&history)
-
-	db.Save(&medication)
 
 	http.Redirect(w, r, "/listaAnimal", http.StatusFound)
 }
@@ -974,11 +974,15 @@ func postMedication(w http.ResponseWriter, r *http.Request) {
 	date, _ := time.Parse("2006-01-02", r.PostFormValue("Date"))
 	medication.Date = date
 
+	ani := ""
+	med := ""
+
 	r.ParseForm()
 	for _, idAnimals := range r.Form["Animal"] {
 		animal := Animal{}
 		id, _ := strconv.Atoi(idAnimals)
 		db.Find(&animal, id)
+		ani += ", " + fmt.Sprint(animal.Name)
 		medication.Animals = append(medication.Animals, &animal)
 	}
 
@@ -987,21 +991,22 @@ func postMedication(w http.ResponseWriter, r *http.Request) {
 		medicine := Medicine{}
 		id, _ := strconv.Atoi(idMedicines)
 		db.Find(&medicine, id)
+		med += ", " + fmt.Sprint(medicine.Name)
 		medication.Medicines = append(medication.Medicines, medicine)
 	}
 
 	ctx := GetContext(w, r)
 	medication.User = ctx.User
 
+	db.Save(&medication)
+
 	history := History{}
-	history.Description = "Medicação coletiva realizada: " + desc
+	history.Description = "Medicação coletiva realizada do(s) animal(is)" + ani + " com o(s) remédio(s)" + med + " em " + medication.DateFmt()
 	history.Animals = medication.Animals
 	history.User = ctx.User
 	history.Medication = &medication
 	history.Date = time.Now()
 	db.Save(&history)
-
-	db.Save(&medication)
 
 	http.Redirect(w, r, "/listaMedication", http.StatusFound)
 }
@@ -1138,15 +1143,15 @@ func postWeight(w http.ResponseWriter, r *http.Request) {
 
 	weight.Animal = &animal
 
+	db.Save(&weight)
+
 	ctx := GetContext(w, r)
 	history := History{}
-	history.Description = "Pesagem realizada: " + animal.Name + " " + r.PostFormValue("Weight") + "kg em" + date.String()
+	history.Description = "Pesagem realizada: " + animal.Name + " " + r.PostFormValue("Weight") + "kg em " + weight.DateFmt()
 	history.User = ctx.User
 	history.Animals = []*Animal{&animal}
 	history.Date = time.Now()
 	db.Save(&history)
-
-	db.Save(&weight)
 
 	url := "/weight/" + vars["idAnimal"]
 
